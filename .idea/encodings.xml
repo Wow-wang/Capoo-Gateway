@@ -10,9 +10,19 @@
     <file url="file://$PROJECT_DIR$/gateway-client/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-client/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-config-center/gateway-config-center-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-config-center/gateway-config-center-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-config-center/gateway-config-center-nacos-impl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-config-center/gateway-config-center-nacos-impl/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-config-center/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-config-center/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-core/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/gateway-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-nacos-impl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-nacos-impl/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-register-center/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-register-center/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />

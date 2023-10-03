@@ -16,6 +16,11 @@
     <module>gateway-client</module>
     <module>backend-http-server</module>
     <module>backend-dubbo-server</module>
+      <module>gateway-register-center/gateway-register-center-api</module>
+      <module>gateway-register-center/gateway-register-center-nacos-impl</module>
+      <module>gateway-config-center</module>
+      <module>gateway-config-center/gateway-config-center-api</module>
+      <module>gateway-config-center/gateway-config-center-nacos-impl</module>
   </modules>
 
 

@@ -1,7 +1,7 @@
 package org.wow.core.context;
 
 import io.netty.channel.ChannelHandlerContext;
-import org.wow.core.config.Rule;
+import org.wow.common.config.Rule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -191,7 +191,7 @@ public class BasicContext implements IContext{
     }
 
     @Override
-    public void invokeCompletedCallBack(Consumer<IContext> consumer) {
+    public void invokeCompletedCallBack() {
         if(completedCallbacks == null){
             completedCallbacks.forEach(call->call.accept(this));
         }

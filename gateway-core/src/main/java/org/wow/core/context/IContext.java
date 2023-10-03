@@ -2,7 +2,7 @@ package org.wow.core.context;
 
 
 import io.netty.channel.ChannelHandlerContext;
-import org.wow.core.config.Rule;
+import org.wow.common.config.Rule;
 
 import java.util.function.Consumer;
 
@@ -150,6 +150,6 @@ public interface IContext {
      * 设置回调函数
      * @param consumer
      */
-    void invokeCompletedCallBack(Consumer<IContext> consumer);
+    void invokeCompletedCallBack();
 
 }

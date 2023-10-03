@@ -88,6 +88,7 @@ public interface IGatewayRequest {
      * @param
      */
     String getFinalUrl();
+
     /**
      * 构造最终的请求对象
      * @return

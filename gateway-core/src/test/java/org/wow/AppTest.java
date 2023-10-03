@@ -1,38 +1,20 @@
 package org.wow;
 
+import com.google.common.annotations.VisibleForTesting;
 import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.
  */
 public class AppTest 
-    extends TestCase
+
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+//    @Test
+//    public void test1() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+//        Class c = Class.forName("String");
+//        //通过Class类的newInstance()方法创建对象
+//        String sup = c.newInstance();
+//
+//    }
 }

@@ -302,7 +302,7 @@ public class GatewayRequest implements IGatewayRequest{
 
     @Override
     public String getFinalUrl() {
-        return modifyScheme+modifyHost+modifyHost;
+        return modifyScheme+modifyHost+modifyPath;
     }
 
     @Override

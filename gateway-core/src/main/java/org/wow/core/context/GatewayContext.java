@@ -2,7 +2,7 @@ package org.wow.core.context;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
-import org.wow.core.config.Rule;
+import org.wow.common.config.Rule;
 import org.wow.common.utils.AssertUtil;
 import org.wow.core.request.GatewayRequest;
 import org.wow.core.response.GatewayResponse;
