@@ -3,6 +3,7 @@ package org.wow.core.helper;
 import org.asynchttpclient.*;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 异步的http辅助类
@@ -42,6 +43,7 @@ public class AsyncHttpHelper {
 		 */
 		ListenableFuture<Response> future = asyncHttpClient.executeRequest(request);
 		return future.toCompletableFuture();
+		// 设置超时时间 return future.toCompletableFuture().orTimeout(5,TimeUnit.SECONDS);
 	}
 
 

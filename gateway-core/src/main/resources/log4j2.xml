@@ -35,11 +35,11 @@
 	  </Appenders>
 	  
 	<Loggers>
-	    <Logger name="com.imooc.gateway.core.*" level="info" includeLocation="true">
+	    <Logger name="com.wow.gateway.core.*" level="info" includeLocation="true">
 	      <AppenderRef ref="RandomAccessFile"/>
 	    </Logger>
    
-        <Root level="debug">
+        <Root level="info">
             <Appender-Ref ref="CONSOLE"/>
             <!--  
             <Appender-Ref ref="RandomAccessFile"/>

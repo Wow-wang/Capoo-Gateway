@@ -62,7 +62,7 @@ public class RoundRobinLoadBalanceRule implements IGatewayLoadBalanceRule{
             return null;
         }else{
             int pos = Math.abs(this.position.incrementAndGet());
-            return instances.get(pos% instances.size());
+            return instances.get(pos % instances.size());
         }
     }
 }

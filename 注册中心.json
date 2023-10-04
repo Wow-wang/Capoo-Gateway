@@ -10,10 +10,31 @@
         "/http-server/ping","/user/update"
       ],
       "filterConfigs": [{
-        "id": "load_balance_filter",
+          "id": "load_balance_filter",
+          "config": {
+            "load_balancer": "RoundRobin"
+          }
+        },{
+          "id" : "flow_ctl_filter"
+      }],
+      "retryConfig": {
+        "times":5
+      },
+      "flowCtlConfigs": [{
+        "type": "path",
+        "model" : "distributed",
+        "value" : "/http-server/ping",
         "config": {
-          "load_balancer": "RoundRobin"
+          "duration": 20,
+          "permits": 2
         }
+      }]
+      ,
+      "hystrixConfigs": [{
+        "path": "/http-server/ping",
+        "timeoutInMilliseconds": 5000,
+        "threadCoreSize": 2,
+        "fallbackResponse": "熔断超时"
       }]
     }]
 }

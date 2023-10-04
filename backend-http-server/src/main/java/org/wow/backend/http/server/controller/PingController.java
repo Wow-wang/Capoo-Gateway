@@ -24,4 +24,11 @@ public class PingController {
         return "pong";
     }
 
+    @ApiInvoker(path = "/http-server111/ping")
+    @GetMapping("/http-server111/ping")
+    public String ping111() {
+        log.info("{}", apiProperties);
+        return "pong111";
+    }
+
 }

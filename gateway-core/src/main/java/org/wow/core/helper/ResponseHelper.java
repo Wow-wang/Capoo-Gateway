@@ -73,7 +73,9 @@ public class ResponseHelper {
 		
 		//	释放资源
 		context.releaseRequest();
-		
+//		if(context.getThrowable()!=null){
+//		}
+
 		if(context.isWritten()) {
 			//	1：第一步构建响应对象，并写回数据
 			FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(context, (GatewayResponse)context.getResponse());

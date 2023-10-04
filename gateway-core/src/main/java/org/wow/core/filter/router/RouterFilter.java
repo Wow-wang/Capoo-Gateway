@@ -3,6 +3,7 @@ package org.wow.core.filter.router;
 import lombok.extern.slf4j.Slf4j;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
+import org.wow.common.config.Rule;
 import org.wow.common.enums.ResponseCode;
 import org.wow.common.exception.ConnectException;
 import org.wow.common.exception.ResponseException;
@@ -14,6 +15,7 @@ import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
 import org.wow.core.response.GatewayResponse;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
@@ -41,8 +43,17 @@ public class RouterFilter implements Filter {
 
     @Override
     public void doFilter(GatewayContext gatewayContext) throws Exception {
+
+
+
+
+
+
+
+
         Request request = gatewayContext.getRequest().build();
 
+        // 发送消息
         CompletableFuture<Response> future = AsyncHttpHelper.getInstance().executeRequest(request);
 
         // 拿到是双异步还是单异步的模式
@@ -69,9 +80,16 @@ public class RouterFilter implements Filter {
      */
     private void complete(Request request, Response response, Throwable throwable, GatewayContext gatewayContext) {
         try {
-            gatewayContext.releaseRequest();
 
-            
+            // 重试
+            Rule rule = gatewayContext.getRule();
+            int currentRetryTimes = gatewayContext.getCurrentRetryTimes();
+            int confRetryTimes = rule.getRetryConfig().getTimes();
+
+            if((throwable instanceof  TimeoutException || throwable instanceof IOException) && currentRetryTimes <= confRetryTimes){
+                doRetry(gatewayContext,currentRetryTimes);
+                return;
+            }
 
 
             if(Objects.nonNull(throwable)){
@@ -79,10 +97,12 @@ public class RouterFilter implements Filter {
                 if(throwable instanceof TimeoutException){
                     log.warn("complete time out {}",url);
                     gatewayContext.setThrowable(new ResponseException(ResponseCode.REQUEST_TIMEOUT));
+                    gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(ResponseCode.REQUEST_TIMEOUT));
                 }else{
                     gatewayContext.setThrowable(new ConnectException(throwable,
                             gatewayContext.getUniqueId(),
                             url,ResponseCode.HTTP_RESPONSE_ERROR));
+                    gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(ResponseCode.HTTP_RESPONSE_ERROR));
                 }
             }else{
                 gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(response));
@@ -93,6 +113,16 @@ public class RouterFilter implements Filter {
         } finally{
             gatewayContext.written();
             ResponseHelper.writeResponse(gatewayContext);
+        }
+    }
+
+    private void doRetry(GatewayContext gatewayContext, int currentRetryTimes)  {
+        System.out.println("当前重试次数"+currentRetryTimes);
+        gatewayContext.setCurrentRetryTimes(currentRetryTimes + 1);
+        try {
+            doFilter(gatewayContext);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

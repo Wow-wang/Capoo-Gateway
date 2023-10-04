@@ -44,7 +44,7 @@ public class RequestHelper {
 				ctx,
 				HttpUtil.isKeepAlive(request),
 				gateWayRequest,
-				rule);
+				rule,0);
 
 
 		//后续服务发现做完，这里都要改成动态的 -- 已经在负载均衡中实现

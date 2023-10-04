@@ -60,7 +60,14 @@ public class Rule implements Comparable<Rule>, Serializable {
      */
     private Set<FilterConfig> filterConfigs = new HashSet<>();
 
+
     private RetryConfig retryConfig = new RetryConfig();
+
+    /**
+     * 限流配置
+     */
+    private Set<FlowCtlConfig> flowCtlConfigs = new HashSet<>();
+    private FlowCtlConfig flowCtlConfig = new FlowCtlConfig();
 
     public RetryConfig getRetryConfig() {
         return retryConfig;
@@ -92,6 +99,60 @@ public class Rule implements Comparable<Rule>, Serializable {
         this.protocol = protocol;
         this.order = order;
         this.filterConfigs = filterConfigs;
+    }
+    // 限流
+    public static class FlowCtlConfig{
+        /**
+         * 限流类型 -可能是path 可能是IP 也可能是服务
+         */
+        private String type;
+
+        /**
+         * 限流对象
+         */
+        private String value;
+
+        /**
+         * 限流模式 单机还有分布式
+         */
+        private String model;
+
+        /**
+         * 限流规则
+         */
+        private String config;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getModel() {
+            return model;
+        }
+
+        public void setModel(String model) {
+            this.model = model;
+        }
+
+        public String getConfig() {
+            return config;
+        }
+
+        public void setConfig(String config) {
+            this.config = config;
+        }
     }
 
     public static class FilterConfig{
@@ -138,7 +199,7 @@ public class Rule implements Comparable<Rule>, Serializable {
         }
     }
 
-    private static class RetryConfig{
+    public static class RetryConfig{
         //重试次数
         private int times;
 
@@ -150,6 +211,13 @@ public class Rule implements Comparable<Rule>, Serializable {
             this.times = times;
         }
 
+    }
+    public Set<FlowCtlConfig> getFlowCtlConfigs() {
+        return flowCtlConfigs;
+    }
+
+    public void setFlowCtlConfigs(Set<FlowCtlConfig> flowCtlConfigs) {
+        this.flowCtlConfigs = flowCtlConfigs;
     }
 
     /**
