@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
@@ -141,6 +142,10 @@ public class GatewayRequest implements IGatewayRequest{
      * 可修改的请求路径
      */
     private String modifyPath;
+    @Setter
+    @Getter
+    private long userId;
+
     /**
      * 构建下游请求时的http构建器
      */
@@ -307,8 +312,9 @@ public class GatewayRequest implements IGatewayRequest{
 
     @Override
     public Request build() {
-
         requestBuilder.setUrl(getFinalUrl());
+        // 传给下游服务
+        requestBuilder.addHeader("userId",String.valueOf(userId));
         return requestBuilder.build();
     }
 }

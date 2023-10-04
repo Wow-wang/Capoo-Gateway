@@ -109,13 +109,57 @@ public class DynamicConfigManager {
 	 * 最开始BootStrap加载的时候 把规则刷新到管理器内部
 	 * @param ruleList
 	 */
+
+	/**
+	 * 单个Rule
+	 * {
+	 *       "id" : "user",
+	 *       "name" : "user",
+	 *       "protocol" : "http",
+	 *       "serviceId" : "backend-http-server",
+	 *       "prefix" : "/user",
+	 *       "paths": [
+	 *         "/http-server/ping","/user/update"
+	 *       ],
+	 *       "filterConfigs": [{
+	 *           "id": "load_balance_filter",
+	 *           "config": {
+	 *             "load_balancer": "RoundRobin"
+	 *           }
+	 *         },{
+	 *           "id" : "flow_ctl_filter"
+	 *       }],
+	 *       "retryConfig": {
+	 *         "times":5
+	 *       },
+	 *       "flowCtlConfigs": [{
+	 *         "type": "path",
+	 *         "model" : "distributed",
+	 *         "value" : "/http-server/ping",
+	 *         "config": {
+	 *           "duration": 20,
+	 *           "permits": 2
+	 *         }
+	 *       }]
+	 *       ,
+	 *       "hystrixConfigs": [{
+	 *         "path": "/http-server/ping",
+	 *         "timeoutInMilliseconds": 5000,
+	 *         "threadCoreSize": 2,
+	 *         "fallbackResponse": "熔断超时"
+	 *       }]
+	 *     }
+	 */
 	public void putAllRule(List<Rule> ruleList) {
 		ConcurrentHashMap<String,Rule> newRuleMap = new ConcurrentHashMap<>();
 		ConcurrentHashMap<String,Rule> newPathMap = new ConcurrentHashMap<>();
 		ConcurrentHashMap<String,List<Rule>> newServiceMap = new ConcurrentHashMap<>();
 		for(Rule rule : ruleList){
+			// Rule id
 			newRuleMap.put(rule.getId(),rule);
+			// Rule serviceId
 			System.out.println(rule.getServiceId());
+
 			List<Rule> rules = newServiceMap.get(rule.getServiceId());
 			if(rules == null){
 				rules = new ArrayList<>();
@@ -123,6 +167,7 @@ public class DynamicConfigManager {
 			rules.add(rule);
 			newServiceMap.put(rule.getServiceId(),rules);
 
+			// Rule path
 			List<String> paths = rule.getPaths();
 			for (String path : paths) {
 				String key = rule.getServiceId()+"."+path;

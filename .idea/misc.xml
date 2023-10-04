@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/gateway-core/pom.xml" />
+        <option value="$PROJECT_DIR$/backend-user-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

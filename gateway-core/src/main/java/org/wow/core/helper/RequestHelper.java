@@ -114,6 +114,7 @@ public class RequestHelper {
 		if(rule != null){
 			return rule;
 		}
+		// Rule Prefix
 		return DynamicConfigManager.getInstance().getRuleByServiceId(serviceId)
 				.stream().filter(r->gateWayRequest.getPath().startsWith(r.getPrefix()))
 				.findAny().orElseThrow(()->new ResponseException(ResponseCode.PATH_NO_MATCHED));

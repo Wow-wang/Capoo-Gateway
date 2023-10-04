@@ -1,8 +1,44 @@
 {
-  "rules": [
+  "rules": [{
+    "id" : "user",
+    "name" : "user",
+    "protocol" : "http",
+    "serviceId" : "backend-user-server",
+    "prefix" : "/user",
+    "paths": [
+
+    ],
+    "filterConfigs": [{
+      "id": "load_balance_filter",
+      "config": {
+        "load_balancer": "RoundRobin"
+      }
+    },{
+      "id" : "flow_ctl_filter"
+    }],
+    "retryConfig": {
+      "times":5
+    },
+    "flowCtlConfigs": [{
+      "type": "path",
+      "model" : "distributed",
+      "value" : "/http-server/ping",
+      "config": {
+        "duration": 20,
+        "permits": 2
+      }
+    }]
+  ,
+    "hystrixConfigs": [{
+      "path": "/http-server/ping",
+      "timeoutInMilliseconds": 5000,
+      "threadCoreSize": 2,
+      "fallbackResponse": "熔断超时"
+    }]
+  },
     {
-      "id" : "1",
-      "name" : "test-1",
+      "id" : "http-user",
+      "name" : "http-user",
       "protocol" : "http",
       "serviceId" : "backend-http-server",
       "prefix" : "/user",
@@ -35,6 +71,23 @@
         "timeoutInMilliseconds": 5000,
         "threadCoreSize": 2,
         "fallbackResponse": "熔断超时"
+      }]
+    },{
+      "id" : "user-private",
+      "name" : "user-private",
+      "protocol" : "http",
+      "serviceId" : "backend-user-server",
+      "prefix" : "/user/private",
+      "paths": [
+
+      ],
+      "filterConfigs": [{
+        "id": "load_balance_filter",
+        "config": {
+          "load_balancer": "random"
+        }
+      },{
+        "id" : "user_auth_filter"
       }]
     }]
 }

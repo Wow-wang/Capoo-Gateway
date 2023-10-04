@@ -64,10 +64,13 @@ public class Rule implements Comparable<Rule>, Serializable {
     private RetryConfig retryConfig = new RetryConfig();
 
     /**
-     * 限流配置
+     * 限流熔断配置 使用Set
      */
     private Set<FlowCtlConfig> flowCtlConfigs = new HashSet<>();
-    private FlowCtlConfig flowCtlConfig = new FlowCtlConfig();
+//    private FlowCtlConfig flowCtlConfig = new FlowCtlConfig();
+
+    private Set<HystrixConfig> hystrixConfigs = new HashSet<>();
+
 
     public RetryConfig getRetryConfig() {
         return retryConfig;
@@ -212,6 +215,23 @@ public class Rule implements Comparable<Rule>, Serializable {
         }
 
     }
+
+    @Data
+    public static class HystrixConfig{
+        private String path;
+        private int timeoutInMilliseconds;
+        private int threadCoreSize;
+        private String fallbackResponse;
+    }
+
+    public Set<HystrixConfig> getHystrixConfigs() {
+        return hystrixConfigs;
+    }
+
+    public void setHystrixConfigs(Set<HystrixConfig> hystrixConfigs) {
+        this.hystrixConfigs = hystrixConfigs;
+    }
+
     public Set<FlowCtlConfig> getFlowCtlConfigs() {
         return flowCtlConfigs;
     }
@@ -285,5 +305,8 @@ public class Rule implements Comparable<Rule>, Serializable {
     public int hashCode(){
         return Objects.hash(id);
     }
+
+
+
 
 }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.apache.tomcat.jni.Time.sleep;
+
 @Slf4j
 @RestController
 @ApiService(serviceId = "backend-http-server", protocol = ApiProtocol.HTTP, patternPath = "/http-server/**")
@@ -19,8 +21,9 @@ public class PingController {
 
     @ApiInvoker(path = "/http-server/ping")
     @GetMapping("/http-server/ping")
-    public String ping() {
+    public String ping() throws InterruptedException {
         log.info("{}", apiProperties);
+//        Thread.sleep(200000);
         return "pong";
     }
 
