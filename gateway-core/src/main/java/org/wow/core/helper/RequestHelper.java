@@ -1,7 +1,9 @@
 package org.wow.core.helper;
 
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.wow.common.config.*;
 import org.wow.common.constants.BasicConst;
@@ -33,6 +35,14 @@ public class RequestHelper {
 		ServiceInvoker serviceInvoker = new HttpServiceInvoker();
 		serviceInvoker.setInvokerPath(gateWayRequest.getPath());
 		serviceInvoker.setTimeout(500);
+
+		// 如果发现服务定义未启用 直接返回
+		if(!serviceDefinition.isEnable()){
+			FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(ResponseCode.INTERNAL_ERROR);
+			ctx.writeAndFlush(httpResponse)
+					.addListener(ChannelFutureListener.CLOSE); // 释放资源后关闭
+			ReferenceCountUtil.release(request);
+		}
 
 		// 根据请求对象获取规则
 		Rule rule = getRule(gateWayRequest,serviceDefinition.getServiceId());

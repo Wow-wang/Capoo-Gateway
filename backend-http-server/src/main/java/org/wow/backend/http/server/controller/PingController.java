@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.apache.tomcat.jni.Time.sleep;
+import javax.annotation.PostConstruct;
+
 
 @Slf4j
 @RestController
 @ApiService(serviceId = "backend-http-server", protocol = ApiProtocol.HTTP, patternPath = "/http-server/**")
 public class PingController {
+
 
     @Autowired
     private ApiProperties apiProperties;
@@ -22,15 +24,14 @@ public class PingController {
     @ApiInvoker(path = "/http-server/ping")
     @GetMapping("/http-server/ping")
     public String ping() throws InterruptedException {
-        log.info("{}", apiProperties);
-//        Thread.sleep(200000);
+        log.info("ping pang");
+        Thread.sleep(100);
         return "pong";
     }
 
     @ApiInvoker(path = "/http-server111/ping")
     @GetMapping("/http-server111/ping")
     public String ping111() {
-        log.info("{}", apiProperties);
         return "pong111";
     }
 

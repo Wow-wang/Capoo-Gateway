@@ -1,7 +1,10 @@
 package org.wow.core.context;
 
+import io.micrometer.core.instrument.Timer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.wow.common.config.Rule;
 import org.wow.common.utils.AssertUtil;
 import org.wow.core.request.GatewayRequest;
@@ -18,6 +21,14 @@ public class GatewayContext extends BasicContext{
     public Rule rule;
 
     private int currentRetryTimes;
+
+    @Setter
+    @Getter
+    private boolean gray;
+
+    @Setter
+    @Getter
+    private Timer.Sample timerSample;
 
     public GatewayContext(String protocal, ChannelHandlerContext nettyCtx, boolean keepAlive, GatewayRequest request, Rule rule,int currentRetryTimes) {
         super(protocal, nettyCtx, keepAlive);

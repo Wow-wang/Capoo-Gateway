@@ -20,6 +20,7 @@
         <hystrix.core.version>1.5.12</hystrix.core.version>
         <hystrix.javanica.version>1.5.12</hystrix.javanica.version>
         <hystrix.metrics.version>1.5.12</hystrix.metrics.version>
+        <sentinel-version>1.8.6</sentinel-version>
     </properties>
 
     <dependencies>
@@ -41,12 +42,22 @@
         </dependency>
         <dependency>
             <groupId>org.wow</groupId>
+            <artifactId>gateway-register-center-zookeeper-impl</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wow</groupId>
             <artifactId>gateway-config-center-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wow</groupId>
             <artifactId>gateway-config-center-nacos-impl</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wow</groupId>
+            <artifactId>gateway-config-center-zookeeper-impl</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -105,6 +116,43 @@
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.1.1</version>
+        </dependency>
+
+
+        <!-- 用于上报监控指标数据 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>1.10.2</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-trace</artifactId>
+            <version>8.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-log4j-2.x</artifactId>
+            <version>8.15.0</version>
+        </dependency>
+        <dependency>
+        <groupId>com.alibaba.csp</groupId>
+        <artifactId>sentinel-core</artifactId>
+            <version>${sentinel-version}</version>
         </dependency>
     </dependencies>
 </project>

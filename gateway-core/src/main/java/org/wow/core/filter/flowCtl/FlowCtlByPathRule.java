@@ -74,7 +74,7 @@ public class FlowCtlByPathRule implements IGatewayFlowCtlRule{
             if(guavaCountLimiter == null){
                 throw new RuntimeException("获取单机限流工具类为空");
             }
-            double count = Math.ceil(permits/duration);
+            double count = Math.ceil(permits/duration*100);
             flag = guavaCountLimiter.acquire((int)count);
         }
         if(!flag){

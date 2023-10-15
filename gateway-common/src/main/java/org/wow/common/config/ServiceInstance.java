@@ -1,5 +1,8 @@
 package org.wow.common.config;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -51,6 +54,14 @@ public class ServiceInstance implements Serializable {
 	 * 	服务实例对应的版本号
 	 */
 	protected String version;
+
+
+	/**
+	 * 服务是否是灰色的
+	 */
+	@Setter
+	@Getter
+	private boolean gray;
 
 	public ServiceInstance() {
 		super();

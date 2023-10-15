@@ -54,6 +54,7 @@ public class NacosRegisterCenter implements RegisterCenter {
     private List<RegisterCenterListener> registerCenterListenerList  = new CopyOnWriteArrayList<>();
 
 
+    // 每个registerCenter对应了唯一Address 和 env
     @Override
     public void init(String registerAddress, String env) {
         this.registerAddress = registerAddress;
@@ -135,6 +136,7 @@ public class NacosRegisterCenter implements RegisterCenter {
 
                 for(String service : serviceList){
                     if(subscribeService.contains(service)){
+                        // 如果原本就注册过监听器 就不需要监听了
                         continue;
                     }
 
@@ -183,7 +185,7 @@ public class NacosRegisterCenter implements RegisterCenter {
                             .get(GatewayConst.META_DATA_KEY), ServiceDefinition.class);
                     log.info("注册服务发生变化获取到的 serviceDefinition ： {}",serviceDefinition);
 
-                    // 获取服务实例信息
+                     // 获取服务实例信息
 //                    List<Instance> allInstances = namingService.getAllInstances(serviceName, env);
 //                    System.out.println(serviceName+":"+service.getName());
                     List<Instance> allInstances = namingService.getAllInstances(service.getName(), env);

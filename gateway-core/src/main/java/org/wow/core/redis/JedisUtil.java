@@ -271,13 +271,21 @@ public class JedisUtil {
         }
     }
 
+    public boolean isClose(){
+        Jedis jedis = jedisPool.getJedis();
+        if(jedis == null){
+            return true;
+        }
+        return false;
+    }
+
     public Object executeScript(String key, int limit, int expire){
         Jedis jedis = jedisPool.getJedis();
         String lua = buildLuaScript();
         String scriptLoad =jedis.scriptLoad(lua);
         try {
             Object result = jedis.evalsha(scriptLoad, Arrays.asList(key), Arrays.asList(String.valueOf(expire), String.valueOf(limit)));
-            System.out.println(result);
+//            System.out.println(result);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -294,7 +302,9 @@ public class JedisUtil {
     }
 
 
-    // 构造lua脚本
+
+
+    // 构造lua脚本 计数器限流
     private static String buildLuaScript() {
         String lua = "local num = redis.call('incr', KEYS[1])\n" +
                 "if tonumber(num) == 1 then\n" +

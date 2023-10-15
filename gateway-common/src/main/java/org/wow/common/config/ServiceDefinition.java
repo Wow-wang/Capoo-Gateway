@@ -48,7 +48,8 @@ public class ServiceDefinition implements Serializable {
 	 * 	服务启用禁用
 	 */
 	private boolean enable = true;
-	
+
+
 	/**
 	 * 	服务列表信息：
 	 */

@@ -1,6 +1,7 @@
 package org.wow.core.filter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.skywalking.apm.toolkit.trace.Trace;
 import org.wow.common.constants.GatewayConst;
 import org.wow.core.context.GatewayContext;
 
@@ -35,8 +36,9 @@ public class GatewayFilterChain {
         return this;
     }
 
+    @Trace
     public GatewayContext doFilter(GatewayContext ctx) throws Throwable{
-        // 为空？？？
+
         if(filters.isEmpty()){
             return ctx;
         }
@@ -44,6 +46,9 @@ public class GatewayFilterChain {
         try {
             for(Filter fl : filters){
                 fl.doFilter(ctx);
+                if(ctx.isTerminated()){
+                    break;
+                }
             }
         } catch (Exception e) {
             log.error("执行过滤器发生异常 异常信息: {}" ,e.getMessage());

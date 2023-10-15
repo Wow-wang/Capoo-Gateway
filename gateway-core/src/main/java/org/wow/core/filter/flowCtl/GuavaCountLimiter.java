@@ -48,7 +48,7 @@ public class GuavaCountLimiter {
         String key = buffer.append(serviceId).append(".").append(flowCtlConfig.getValue()).toString();
         GuavaCountLimiter countLimiter = resourceRateLimiterMap.get(key);
         if(countLimiter == null){
-            countLimiter = new GuavaCountLimiter(50);
+            countLimiter = new GuavaCountLimiter(100);
             resourceRateLimiterMap.putIfAbsent(key,countLimiter);
         }
         return countLimiter;

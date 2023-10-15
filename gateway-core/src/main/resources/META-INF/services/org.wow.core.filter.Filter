@@ -2,3 +2,7 @@ org.wow.core.filter.loadbalance.LoadBalanceFilter
 org.wow.core.filter.router.RouterFilter
 org.wow.core.filter.flowCtl.FlowCtlFilter
 org.wow.core.filter.Auth.UserAuthFilter
+org.wow.core.filter.gray.GrayFilter
+org.wow.core.filter.monitor.MonitorFilter
+org.wow.core.filter.monitor.MonitorEndFilter
+org.wow.core.filter.mock.MockFilter

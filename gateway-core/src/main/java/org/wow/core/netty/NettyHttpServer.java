@@ -80,6 +80,7 @@ public class NettyHttpServer implements LifeCycle {
 
     @Override
     public void start() {
+        // Netty服务器会一直运行，直到显式地停止它或发生不可恢复的错误
         this.serverBootstrap
                 .group(eventLoopGroupBoss,eventLoopGroupWorker)
                 .channel(useEpoll() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)

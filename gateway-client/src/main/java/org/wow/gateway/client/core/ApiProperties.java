@@ -21,4 +21,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
     private String registerAddress;
 
     private String env = "dev";
+
+    private boolean gray;
 }

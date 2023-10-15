@@ -21,21 +21,36 @@ import static org.wow.common.constants.BasicConst.COLON_SEPARATOR;
 @Slf4j
 public class Bootstrap {
     public static void main(String[] args) {
+        System.out.println(Runtime.getRuntime().availableProcessors());
         // 加载网关核心静态配置
         Config config = ConfigLoader.getInstance().load(args);
         System.out.println(config.getPort());
-        System.out.println(config.getRegistryAddress());
+//        System.out.println(config.getRegistryAddress());
         System.out.println(config.getEnv());
 
         //插件初始化
         //配置中心管理器初始化 连接配置中心，监听配置的新增 修改 删除
         ServiceLoader<ConfigCenter> serviceLoader = ServiceLoader.load(ConfigCenter.class);
+/**
+ * 输出结果：
+ * org.wow.gateway.config.center.zookeeper.ZookeeperConfigCenter
+ * org.wow.gateway.config.center.nacos.NacosConfigCenter
+ *
+ * ServiceLoader 仅在需要时才会加载实现类，而不会在初始化时加载所有实现类 这有助于提高性能和节省资源。
+ * 如果您只需要一个实现类，
+ * 使用 findFirst() 来获取第一个发现的实现类
+ * 如果需要加载所有实现类，可以使用 iterator() 来获取迭代器并遍历所有实现类
+ */
+
+//        serviceLoader.forEach(configCenter -> {
+//            System.out.println(configCenter.getClass().getName());
+//        });
 
         final ConfigCenter configCenter = serviceLoader.findFirst().orElseThrow(() -> {
             log.error("not found ConfigCenter impl");
             return new RuntimeException("not found ConfigCenter impl");
         });
-        configCenter.init(config.getRegistryAddress(), config.getEnv());
+        configCenter.init(config.getEnv());
         /**
          * listener 参数实际上是用于在 configCenter.subscribeRulesChange 方法内部执行规则变更操作的回调函数。
          * Lambda 表达式 (rules -> DynamicConfigManager.getInstance().putAllRule(rules))
@@ -70,7 +85,9 @@ public class Bootstrap {
             log.error("not found RegisterCenter impl");
             return new RuntimeException("not found RegisterCenter impl");
         });
-        registerCenter.init(config.getRegistryAddress(), config.getEnv());
+
+        // 设置Zookeeper or Nacos
+        registerCenter.init(config.getZookeeperRegistryAddress(), config.getEnv());
 
 
         //构造网关服务定义和服务实例

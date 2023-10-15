@@ -1,10 +1,14 @@
 package org.wow.core.filter.router;
 
+import com.alibaba.nacos.common.utils.BiConsumer;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.netflix.hystrix.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.skywalking.apm.toolkit.trace.TraceCrossThread;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wow.common.config.Rule;
 import org.wow.common.enums.ResponseCode;
 import org.wow.common.exception.ConnectException;
@@ -16,12 +20,14 @@ import org.wow.core.filter.FilterAspect;
 import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
 import org.wow.core.response.GatewayResponse;
+import sun.misc.Unsafe;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.wow.common.constants.FilterConst.*;
 
@@ -36,7 +42,7 @@ import static org.wow.common.constants.FilterConst.*;
     name = ROUTER_FILTER_NAME,
     order = ROUTER_FILTER_ORDER)
 public class RouterFilter implements Filter {
-
+    private static Logger accessLog = LoggerFactory.getLogger("accessLog");
     /**
      * 负责接收原始请求，将其发送到后端服务器（通过 AsyncHttpHelper 执行异步HTTP请求）
      * 并在请求完成时触发回调来处理结果。
@@ -44,8 +50,11 @@ public class RouterFilter implements Filter {
      * @param gatewayContext
      */
 
+  
+
     @Override
     public void doFilter(GatewayContext gatewayContext) throws Exception {
+        log.info("route");
 
         //使用java8 lambda拿到
         Optional<Rule.HystrixConfig> hystrixConfig = getHystrixConfig(gatewayContext);
@@ -57,6 +66,7 @@ public class RouterFilter implements Filter {
 
 
     }
+
 
     // 通过Hystrix执行熔断器操作
     private void routeWithHystrix(GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
@@ -75,6 +85,7 @@ public class RouterFilter implements Filter {
                         .withExecutionTimeoutInMilliseconds(hystrixConfig.get().getTimeoutInMilliseconds())
                         .withExecutionIsolationThreadInterruptOnTimeout(true)
                         .withExecutionTimeoutEnabled(true));
+
         new HystrixCommand<Object>(setter){
 
             @Override
@@ -113,17 +124,48 @@ public class RouterFilter implements Filter {
 
         if(whenComplete){
             future.whenComplete((response, throwable) -> {
-                complete(request,response,throwable,gatewayContext, hystrixConfig);
+                complete(request, response, throwable, gatewayContext,hystrixConfig);
             });
         }else{
             // 需要在另外一个线程执行
             future.whenCompleteAsync((response, throwable) -> {
-                complete(request,response,throwable,gatewayContext, hystrixConfig);
+                complete(request, response, throwable, gatewayContext,hystrixConfig);
             });
         }
         return future;
     }
 
+    /**
+     * 可有可无
+     */
+//    @TraceCrossThread
+    public class CompleteBiConsumer implements BiConsumer<Response,Throwable>{
+        private Request request;
+        private Response response;
+
+        private Throwable throwable;
+        private GatewayContext gatewayContext;
+
+        private Optional<Rule.HystrixConfig> hystrixConfig;
+
+        public CompleteBiConsumer(Request request, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
+            this.request = request;
+            this.gatewayContext = gatewayContext;
+            this.hystrixConfig = hystrixConfig;
+        }
+
+        @Override
+        public void accept(Response response, Throwable throwable) {
+            this.response = response;
+            this.throwable = throwable;
+            this.run();
+        }
+
+        public void run(){
+            //skywalking 会通过 @TraceCrossThread会增强run方法
+            complete(request,response,throwable,gatewayContext, hystrixConfig);
+        }
+    }
 
     /**
      * 释放request 记录response
@@ -134,7 +176,7 @@ public class RouterFilter implements Filter {
      */
     private void complete(Request request, Response response, Throwable throwable, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
         try {
-
+            log.info("complete");
             // 重试
             Rule rule = gatewayContext.getRule();
             int currentRetryTimes = gatewayContext.getCurrentRetryTimes();
@@ -161,6 +203,7 @@ public class RouterFilter implements Filter {
                     gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(ResponseCode.HTTP_RESPONSE_ERROR));
                 }
             }else{
+                // 真正的无错误码response
                 gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(response));
             }
         } catch (Throwable t) {
@@ -169,6 +212,16 @@ public class RouterFilter implements Filter {
         } finally{
             gatewayContext.written();
             ResponseHelper.writeResponse(gatewayContext);
+
+            accessLog.info("{} {} {} {} {} {} {}",
+                    System.currentTimeMillis() - gatewayContext.getRequest().getBeginTime(),
+                    gatewayContext.getRequest().getClientIp(),
+                    gatewayContext.getRequest().getUniqueId(),
+                    gatewayContext.getRequest().getMethod(),
+                    gatewayContext.getRequest().getPath(),
+                    gatewayContext.getResponse().getHttpResponseStatus().code(),
+                    gatewayContext.getResponse().getFutureResponse().getResponseBodyAsBytes().length);
+
         }
     }
 

@@ -43,29 +43,29 @@
       "serviceId" : "backend-http-server",
       "prefix" : "/user",
       "paths": [
-        "/http-server/ping","/user/update"
+        "/http-server/ping","/user/update","/http-server111/ping"
       ],
       "filterConfigs": [{
-          "id": "load_balance_filter",
-          "config": {
-            "load_balancer": "RoundRobin"
-          }
-        },{
-          "id" : "flow_ctl_filter"
+        "id": "load_balance_filter",
+        "config": {
+          "load_balancer": "RoundRobin"
+        }
+      },{
+        "id" : "flow_ctl_filter"
       }],
       "retryConfig": {
         "times":5
       },
       "flowCtlConfigs": [{
-        "type": "path",
+        "type": "service",
         "model" : "distributed",
         "value" : "/http-server/ping",
         "config": {
-          "duration": 20,
-          "permits": 2
+          "duration": 10,
+          "permits": 5
         }
       }]
-      ,
+    ,
       "hystrixConfigs": [{
         "path": "/http-server/ping",
         "timeoutInMilliseconds": 5000,
@@ -79,7 +79,7 @@
       "serviceId" : "backend-user-server",
       "prefix" : "/user/private",
       "paths": [
-
+        "/user/private/user-info"
       ],
       "filterConfigs": [{
         "id": "load_balance_filter",

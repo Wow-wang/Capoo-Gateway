@@ -1,7 +1,10 @@
 package org.wow.common.config;
 
+import org.springframework.util.CollectionUtils;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -56,15 +59,23 @@ public class DynamicConfigManager {
 	
 	/***************** 	对服务实例缓存进行操作的系列方法 	***************/
 
-	public Set<ServiceInstance> getServiceInstanceByUniqueId(String uniqueId){
-		return serviceInstanceMap.get(uniqueId);
+	public Set<ServiceInstance> getServiceInstanceByUniqueId(String uniqueId, boolean gray){
+		Set<ServiceInstance> serviceInstances = serviceInstanceMap.get(uniqueId);
+		if(CollectionUtils.isEmpty(serviceInstances)){
+			return Collections.emptySet();
+		}
+		if(gray){
+			return serviceInstances.stream().filter(ServiceInstance::isGray).collect(Collectors.toSet());
+		}
+		return serviceInstances.stream().filter(((Predicate<ServiceInstance>) ServiceInstance::isGray).negate()).collect(Collectors.toSet());
 	}
 	
 	public void addServiceInstance(String uniqueId, ServiceInstance serviceInstance) {
 		Set<ServiceInstance> set = serviceInstanceMap.get(uniqueId);
 		set.add(serviceInstance);
 	}
-	
+
+	// 会覆盖原来的set集合 旧实例不可用直接覆盖
 	public void addServiceInstance(String uniqueId, Set<ServiceInstance> serviceInstanceSet) {
 		serviceInstanceMap.put(uniqueId, serviceInstanceSet);
 	}

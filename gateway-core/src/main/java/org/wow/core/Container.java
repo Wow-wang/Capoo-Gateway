@@ -3,8 +3,11 @@ package org.wow.core;
 import lombok.extern.slf4j.Slf4j;
 import org.wow.core.netty.NettyHttpClient;
 import org.wow.core.netty.NettyHttpServer;
+import org.wow.core.netty.processor.DisruptorNettyCoreProcessor;
 import org.wow.core.netty.processor.NettyCoreProcessor;
 import org.wow.core.netty.processor.NettyProcessor;
+
+import static org.wow.common.constants.GatewayConst.BUFFER_TYPE_PARALLEL;
 
 /**
  * @program: api-gateway
@@ -38,13 +41,19 @@ public class Container implements LifeCycle{
 
     @Override
     public void init() {
-        this.nettyProcessor = new NettyCoreProcessor();
+        NettyCoreProcessor nettyCoreProcessor = new NettyCoreProcessor();
+        if(BUFFER_TYPE_PARALLEL.equals(config.getBufferType())){
+            this.nettyProcessor = new DisruptorNettyCoreProcessor(config, nettyCoreProcessor);
+        }else{
+             this.nettyProcessor = nettyCoreProcessor;
+        }
         this.nettyHttpServer = new NettyHttpServer(config,nettyProcessor);
         this.nettyHttpClient = new NettyHttpClient(config, nettyHttpServer.getEventLoopGroupWorker());
     }
 
     @Override
     public void start() {
+        nettyProcessor.start();
         nettyHttpServer.start();
         nettyHttpClient.start();
         log.info("api gateway started!");
@@ -52,6 +61,7 @@ public class Container implements LifeCycle{
 
     @Override
     public void shutdown() {
+        nettyProcessor.shutdown();
         nettyHttpServer.shutdown();
         nettyHttpClient.shutdown();
     }

@@ -35,7 +35,7 @@ public class LoadBalanceFilter implements Filter {
     public void doFilter(GatewayContext ctx) throws Exception {
         String serviceId = ctx.getUniqueId();
         IGatewayLoadBalanceRule gatewayLoadBalanceRule = getLoadBalanceRule(ctx);
-        ServiceInstance serviceInstance = gatewayLoadBalanceRule.choose(serviceId);
+        ServiceInstance serviceInstance = gatewayLoadBalanceRule.choose(serviceId,ctx.isGray());
         GatewayRequest request = ctx.getRequest();
         if(serviceInstance != null && request != null){
             String host = serviceInstance.getIp() + ":" + serviceInstance.getPort();

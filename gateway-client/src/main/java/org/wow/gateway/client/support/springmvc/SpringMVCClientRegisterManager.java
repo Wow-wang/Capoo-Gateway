@@ -99,6 +99,8 @@ public class SpringMVCClientRegisterManager extends AbstractClientRegisterManage
                 Class<?> clazz = handlerMethod.getBeanType();
 
                 Object bean = applicationContext.getBean(clazz);
+
+                // 比如 basicErrorController 不止 pingController
                 if(set.contains(bean)){
                     continue;
                 }
@@ -128,8 +130,14 @@ public class SpringMVCClientRegisterManager extends AbstractClientRegisterManage
                 serviceInstance.setVersion(version);
                 serviceInstance.setWeight(DEFAULT_WEIGHT);
 
+                if(getApiProperties().isGray()){
+                    serviceInstance.setGray(true);
+                }
+
                 //注册
                 register(serviceDefinition,serviceInstance);
+
+                set.add(bean);
 
             }
         }

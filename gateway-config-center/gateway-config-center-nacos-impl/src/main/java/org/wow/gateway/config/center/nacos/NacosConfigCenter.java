@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import static org.wow.common.constants.CenterConst.NACOS_REGISTER_ADDRESS;
+
 /**
  * @program: api-gateway
  * @description: 配置信息 configService
@@ -35,8 +37,8 @@ public class NacosConfigCenter implements ConfigCenter {
     private ConfigService configService;
 
     @Override
-    public void init(String serverAddr1, String env) {
-        this.serverAddr = serverAddr1;
+    public void init(String env) {
+        this.serverAddr = NACOS_REGISTER_ADDRESS;
         this.env = env;
 
         try {

@@ -32,6 +32,8 @@ import java.util.concurrent.TimeoutException;
  * @program: api-gateway
  * @description: nettyProcessor实现
  *
+ * 串行
+ *
  * 步骤
  * 1,定义接口
  * 2,最小可用/最核心版本实现
@@ -74,6 +76,16 @@ public class NettyCoreProcessor implements NettyProcessor{
             FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(ResponseCode.INTERNAL_ERROR);
             doWriteAndRelease(ctx,request,httpResponse);
         }
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void shutdown() {
+
     }
 
     private void doWriteAndRelease(ChannelHandlerContext ctx, FullHttpRequest request, FullHttpResponse httpResponse) {

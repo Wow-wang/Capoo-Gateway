@@ -1,6 +1,9 @@
 package org.wow.core;
 
+import com.lmax.disruptor.*;
 import lombok.Data;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @program: api-gateway
@@ -13,11 +16,18 @@ import lombok.Data;
 public class Config {
     private int port = 8888;
 
+    private int prometheusPort = 18000;
+
     private String applicationName = "api-gateway";
 
-    private String registryAddress = "127.0.0.1:8848";
+    // 自己调整
+    private String ZookeeperRegistryAddress = "192.168.220.131:2181";
+
+    private String NacosRegistryAddress = "127.0.0.1:8848";
 
     private String env = "dev";
+
+    private String register = "zookeeper";
 
     //netty
 
@@ -49,6 +59,33 @@ public class Config {
 
     //	客户端空闲连接超时时间, 默认60秒
     private int httpPooledConnectionIdleTimeout = 60 * 1000;
+
+
+    private String bufferType = "parallel";
+
+
+    private int bufferSize = 1024 * 16;
+
+    private int processThread = Runtime.getRuntime().availableProcessors()/4;
+
+    private String waitStrategy = "blocking";
+
+
+
+    public WaitStrategy getWaitStrategy(){
+        switch(waitStrategy){
+            case "blocking": //释放CPU
+                return new BlockingWaitStrategy();
+            case "busySpin": //不释放CPU 低延迟
+                return new BusySpinWaitStrategy();
+            case "yielding": //自旋100次
+                return new YieldingWaitStrategy();
+            case "sleeping":
+                return new SleepingWaitStrategy();
+            default:
+                return new BlockingWaitStrategy();
+        }
+    }
 
     //扩展.......
 }

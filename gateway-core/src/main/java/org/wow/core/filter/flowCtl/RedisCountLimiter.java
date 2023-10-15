@@ -37,6 +37,10 @@ public class RedisCountLimiter {
                 return false;
             }
         } catch (Exception e) {
+            if (jedisUtil.isClose()) {
+                log.error("redis已经关闭");
+                return true;
+            }
             throw new RuntimeException("分布式限流发生错误");
         }
         return true;
