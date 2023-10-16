@@ -40,6 +40,8 @@ public class AsyncHttpHelper {
 	public CompletableFuture<Response> executeRequest(Request request) {
 		/**
 		 * Execute an HTTP request
+		 *
+		 * ListenableFuture 给异步任务添加监听
 		 */
 		ListenableFuture<Response> future = asyncHttpClient.executeRequest(request);
 		return future.toCompletableFuture();

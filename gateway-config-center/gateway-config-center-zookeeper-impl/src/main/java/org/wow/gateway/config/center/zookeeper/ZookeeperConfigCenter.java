@@ -35,6 +35,8 @@ public class ZookeeperConfigCenter implements ConfigCenter {
 
     private String env;
 
+    private static byte[] data;
+
 
     @Override
     public void init(String env) {
@@ -79,10 +81,11 @@ public class ZookeeperConfigCenter implements ConfigCenter {
 
             // 每次任务开始执行时 安排一个任务按照固定的时间间隔执行
             scheduledThreadPool.scheduleWithFixedDelay(()->registerWatcher(listener),
-                    10,10, TimeUnit.SECONDS);
+                    5,5, TimeUnit.SECONDS);
     }
 
     private void registerWatcher(RulesChangeListener listener)  {
+//        System.out.println("registerWatcher begin");
         // 使用getData方法注册Watcher
         try {
             Stat stat = zooKeeper.exists(PATH+env, null
@@ -106,11 +109,13 @@ public class ZookeeperConfigCenter implements ConfigCenter {
 
             if (stat != null) {
                 // 节点存在，开始监听节点的数据变化
-                byte[] data = zooKeeper.getData(PATH+env, false, stat);
-                String config = new String(data, StandardCharsets.UTF_8);
-                System.out.println("Node data: " + new String(data));
-                List<Rule> rules = JSON.parseObject(config).getJSONArray("rules").toJavaList(Rule.class);
-                listener.onRulesChange(rules);
+                if(! (data != null && data.equals(zooKeeper.getData(PATH+env, false, stat)))) {
+                    data = zooKeeper.getData(PATH+env, false, stat);
+                    String config = new String(data, StandardCharsets.UTF_8);
+//                System.out.println("Node data: " + new String(data));
+                    List<Rule> rules = JSON.parseObject(config).getJSONArray("rules").toJavaList(Rule.class);
+                    listener.onRulesChange(rules);
+                }
             } else {
                 System.out.println("Node does not exist.");
             }

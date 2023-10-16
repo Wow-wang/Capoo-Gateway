@@ -152,7 +152,7 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
 
         // 每次任务开始执行时 安排一个任务按照固定的时间间隔执行
         scheduledThreadPool.scheduleWithFixedDelay(()->doSubscribeAllServices(),
-                10,10, TimeUnit.SECONDS);
+                5,5, TimeUnit.SECONDS);
     }
 
     private void doSubscribeAllServices(){

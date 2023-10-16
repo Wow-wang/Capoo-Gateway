@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @program: api-gateway
- * @description: 负载均衡-随机
+ * @description: 负载均衡-权重随机
  * @author: wow
  * @create: 2023-10-02 10:59
  **/
@@ -57,9 +57,34 @@ public class RandomLoadBalanceRule implements IGatewayLoadBalanceRule{
             throw new NotFoundException(ResponseCode.SERVICE_INSTANCE_NOT_FOUND);
         }
         List<ServiceInstance> instances = new ArrayList<ServiceInstance>(serviceInstanceSet);
+
         // ThreadLocalRandom 类来生成一个随机整数，用于选择一个列表（instances）中的元素索引
-        int index = ThreadLocalRandom.current().nextInt(instances.size());
+        int index = indexRandomChooseByWeight(instances);
         ServiceInstance instance = (ServiceInstance)instances.get(index);
         return instance;
     }
+
+    public Integer indexRandomChooseByWeight(List<ServiceInstance> instances){
+        List<Integer> indexes = new ArrayList<>();
+        Integer temp = 0;
+        for(int i = 0; i < instances.size(); i++){
+            temp += instances.get(0).getWeight();
+            indexes.add(temp);
+        }
+        int index = ThreadLocalRandom.current().nextInt(temp);
+
+        int left = 0, right = instances.size() - 1;
+        while(left < right){
+            int mid = (left + right) >> 1;
+            if(indexes.get(mid) >= index){
+                right = mid;
+            }else{
+                left = mid +1;
+            }
+        }
+        return left;
+    }
+
+
+
 }

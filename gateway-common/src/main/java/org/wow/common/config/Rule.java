@@ -64,7 +64,7 @@ public class Rule implements Comparable<Rule>, Serializable {
     private RetryConfig retryConfig = new RetryConfig();
 
     /**
-     * 限流熔断配置 使用Set
+     * 限流熔断配置 使用Set 因为要对多种路径设置限流熔断
      */
     private Set<FlowCtlConfig> flowCtlConfigs = new HashSet<>();
 //    private FlowCtlConfig flowCtlConfig = new FlowCtlConfig();

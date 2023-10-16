@@ -23,7 +23,7 @@ import static org.wow.common.constants.FilterConst.*;
 @Slf4j
 @FilterAspect(id= USER_AUTH_FILTER_ID,
         name = USER_AUTH_FILTER_NAME,
-        order =USER_AUTH_FILTER_ORDER )
+        order = USER_AUTH_FILTER_ORDER )
 public class UserAuthFilter implements Filter {
 
     private static final String SECRET_KEY ="faewifheafewhefsfjkds";

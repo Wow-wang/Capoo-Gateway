@@ -169,7 +169,7 @@ public class DynamicConfigManager {
 			// Rule id
 			newRuleMap.put(rule.getId(),rule);
 			// Rule serviceId
-			System.out.println(rule.getServiceId());
+//			System.out.println(rule.getServiceId());
 
 			List<Rule> rules = newServiceMap.get(rule.getServiceId());
 			if(rules == null){
