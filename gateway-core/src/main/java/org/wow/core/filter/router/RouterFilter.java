@@ -84,7 +84,9 @@ public class RouterFilter implements Filter {
                         // 超时时间
                         .withExecutionTimeoutInMilliseconds(hystrixConfig.get().getTimeoutInMilliseconds())
                         .withExecutionIsolationThreadInterruptOnTimeout(true)
-                        .withExecutionTimeoutEnabled(true));
+                        .withExecutionTimeoutEnabled(true)
+                        // 设置半开启状态的恢复时间为5秒
+                .withCircuitBreakerSleepWindowInMilliseconds(5000));
 
         new HystrixCommand<Object>(setter){
 

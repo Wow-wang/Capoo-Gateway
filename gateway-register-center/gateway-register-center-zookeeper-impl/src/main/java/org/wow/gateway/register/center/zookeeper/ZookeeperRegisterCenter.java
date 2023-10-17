@@ -2,6 +2,7 @@ package org.wow.gateway.register.center.zookeeper;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.wow.common.config.ServiceDefinition;
@@ -30,7 +31,7 @@ import static org.wow.common.constants.CenterConst.*;
 public class ZookeeperRegisterCenter implements RegisterCenter {
     private ZooKeeper zooKeeper;
 
-    private static final String PATH = "/api-gateway-service";
+    private static  String PATH = "/api-gateway-service";
 
     private String registerAddress;
     private String env;
@@ -44,6 +45,9 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
     public void init(String registerAddress, String env) {
         this.registerAddress = registerAddress;
         this.env = env;
+        if(!StringUtils.isEmpty(env)){
+            PATH = PATH + PATH_SEPARATOR + env;
+        }
         try {
             zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,40000,null);
             Stat stat;

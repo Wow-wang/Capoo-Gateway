@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static org.wow.common.constants.BasicConst.PATH_SEPARATOR;
 import static org.wow.common.constants.CenterConst.*;
 
 /**
@@ -30,7 +31,7 @@ import static org.wow.common.constants.CenterConst.*;
 public class ZookeeperConfigCenter implements ConfigCenter {
     private ZooKeeper zooKeeper;
 
-    private static final String PATH = "/api-gateway-config";
+    private static  String PATH = "/api-gateway-config";
 
 
     private String env;
@@ -44,19 +45,20 @@ public class ZookeeperConfigCenter implements ConfigCenter {
         try {
             zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,40000,null);
             this.env = env;
-            stat = zooKeeper.exists(PATH+env,null);
+            PATH = PATH + PATH_SEPARATOR + env;
+            stat = zooKeeper.exists(PATH,null);
             String Config = null;
             Config = new String(Files.readAllBytes(Paths.get(FILEPATH)), StandardCharsets.UTF_8);
             if(stat == null) {
                 String result = zooKeeper.create(
-                        PATH + env,
+                        PATH ,
                         Config.getBytes(StandardCharsets.UTF_8),
                         ZooDefs.Ids.OPEN_ACL_UNSAFE,
                         CreateMode.PERSISTENT
                 );
             }else{
                 zooKeeper.setData(
-                        PATH + env,
+                        PATH,
                         Config.getBytes(StandardCharsets.UTF_8),
                         -1
                 );

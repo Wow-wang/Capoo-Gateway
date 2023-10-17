@@ -55,6 +55,13 @@ public class ServiceInstance implements Serializable {
 	 */
 	protected String version;
 
+	@Getter
+	@Setter
+	private String cluster;
+
+	@Getter
+	@Setter
+	private String env;
 
 	/**
 	 * 服务是否是灰色的
