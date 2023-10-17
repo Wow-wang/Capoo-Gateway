@@ -37,7 +37,7 @@ public class GatewayFilterChain {
     }
 
     @Trace
-    public GatewayContext doFilter(GatewayContext ctx) throws Throwable{
+    public GatewayContext doFilter(GatewayContext ctx) throws Exception{
 
         if(filters.isEmpty()){
             return ctx;

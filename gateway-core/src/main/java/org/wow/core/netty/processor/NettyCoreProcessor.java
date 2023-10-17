@@ -69,11 +69,14 @@ public class NettyCoreProcessor implements NettyProcessor{
 //            route(gatewayContext);
         } catch (BaseException e) {
             log.error("process error {} {}",e.getCode().getCode(),e.getCode().getMessage());
+//            System.out.println(e.getCode().getCode());
+//            System.out.println(e.getCode().getMessage());
             FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(e.getCode());
             doWriteAndRelease(ctx,request,httpResponse);
-        } catch (Throwable t){
-            log.error("process unknown error",t);
-            FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(ResponseCode.INTERNAL_ERROR);
+        } catch (Exception e){
+            log.error("process unknown error",e);
+            GatewayResponse gatewayResponse = GatewayResponse.buildGatewayResponse(e.getMessage());
+            FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(gatewayResponse);
             doWriteAndRelease(ctx,request,httpResponse);
         }
     }

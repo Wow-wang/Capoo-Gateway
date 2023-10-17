@@ -21,7 +21,7 @@ public class ResponseHelper {
 	 */
 	public static FullHttpResponse getHttpResponse(ResponseCode responseCode) {
 		GatewayResponse gatewayResponse = GatewayResponse.buildGatewayResponse(responseCode);
-		DefaultFullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, 
+		DefaultFullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
 				HttpResponseStatus.INTERNAL_SERVER_ERROR,
 				Unpooled.wrappedBuffer(gatewayResponse.getContent().getBytes()));
 		
@@ -33,7 +33,7 @@ public class ResponseHelper {
 	/**
 	 * 通过上下文对象和Response对象 构建FullHttpResponse
 	 */
-	private static FullHttpResponse getHttpResponse(IContext ctx, GatewayResponse gatewayResponse) {
+	public static FullHttpResponse getHttpResponse(GatewayResponse gatewayResponse) {
 		ByteBuf content;
 		if(Objects.nonNull(gatewayResponse.getFutureResponse())) {
 			content = Unpooled.wrappedBuffer(gatewayResponse.getFutureResponse()
@@ -78,7 +78,7 @@ public class ResponseHelper {
 
 		if(context.isWritten()) {
 			//	1：第一步构建响应对象，并写回数据
-			FullHttpResponse httpResponse = ResponseHelper.getHttpResponse(context, (GatewayResponse)context.getResponse());
+			FullHttpResponse httpResponse = ResponseHelper.getHttpResponse((GatewayResponse)context.getResponse());
 			if(!context.isKeepAlive()) {
 				context.getNettyCtx()
 					.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);

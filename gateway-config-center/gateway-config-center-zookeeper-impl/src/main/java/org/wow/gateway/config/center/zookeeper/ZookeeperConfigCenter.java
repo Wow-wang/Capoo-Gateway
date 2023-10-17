@@ -45,6 +45,15 @@ public class ZookeeperConfigCenter implements ConfigCenter {
         try {
             zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,40000,null);
             this.env = env;
+            stat = zooKeeper.exists(PATH,null);
+            if(stat == null) {
+                String result = zooKeeper.create(
+                        PATH ,
+                        null,
+                        ZooDefs.Ids.OPEN_ACL_UNSAFE,
+                        CreateMode.PERSISTENT
+                );
+            }
             PATH = PATH + PATH_SEPARATOR + env;
             stat = zooKeeper.exists(PATH,null);
             String Config = null;
@@ -90,7 +99,7 @@ public class ZookeeperConfigCenter implements ConfigCenter {
 //        System.out.println("registerWatcher begin");
         // 使用getData方法注册Watcher
         try {
-            Stat stat = zooKeeper.exists(PATH+env, null
+            Stat stat = zooKeeper.exists(PATH, null
     //                new Watcher() {
     //            @Override
     //            public void process(WatchedEvent event) {
@@ -111,8 +120,8 @@ public class ZookeeperConfigCenter implements ConfigCenter {
 
             if (stat != null) {
                 // 节点存在，开始监听节点的数据变化
-                if(! (data != null && data.equals(zooKeeper.getData(PATH+env, false, stat)))) {
-                    data = zooKeeper.getData(PATH+env, false, stat);
+                if(! (data != null && data.equals(zooKeeper.getData(PATH, false, stat)))) {
+                    data = zooKeeper.getData(PATH, false, stat);
                     String config = new String(data, StandardCharsets.UTF_8);
 //                System.out.println("Node data: " + new String(data));
                     List<Rule> rules = JSON.parseObject(config).getJSONArray("rules").toJavaList(Rule.class);

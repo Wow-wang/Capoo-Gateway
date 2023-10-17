@@ -88,6 +88,11 @@
             <artifactId>hystrix-javanica</artifactId>
             <version>${hystrix.javanica.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-core</artifactId>
+            <version>1.8.6</version>
+        </dependency>
 
         <!-- 服务鉴权 -->
         <dependency>

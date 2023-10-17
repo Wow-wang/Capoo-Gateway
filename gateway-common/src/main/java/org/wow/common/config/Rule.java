@@ -240,6 +240,13 @@ public class Rule implements Comparable<Rule>, Serializable {
         this.flowCtlConfigs = flowCtlConfigs;
     }
 
+    @Data
+    public static class SentinelConfig{
+        private String path;
+        private int timeoutInMilliseconds;
+        private String fallbackResponse;
+    }
+
     /**
      * 向规则里面提供一些新增配置的方法
      * @param filterConfig

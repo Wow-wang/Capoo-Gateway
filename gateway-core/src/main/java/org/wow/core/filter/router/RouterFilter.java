@@ -67,6 +67,9 @@ public class RouterFilter implements Filter {
 
     }
 
+    private void routeWithSentinel(GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig){
+
+    }
 
     // 通过Hystrix执行熔断器操作
     private void routeWithHystrix(GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
