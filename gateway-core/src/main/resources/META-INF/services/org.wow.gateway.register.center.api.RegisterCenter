@@ -1,0 +1,3 @@
+org.wow.gateway.register.center.zookeeper.ZookeeperRegisterCenter
+org.wow.gateway.register.center.nacos.NacosRegisterCenter
+

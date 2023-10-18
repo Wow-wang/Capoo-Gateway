@@ -1,0 +1,93 @@
+{
+  "rules": [{
+    "id" : "user",
+    "name" : "user",
+    "protocol" : "http",
+    "serviceId" : "backend-user-server",
+    "prefix" : "/user",
+    "paths": [
+
+    ],
+    "filterConfigs": [{
+      "id": "load_balance_filter",
+      "config": {
+        "load_balancer": "RoundRobin"
+      }
+    },{
+      "id" : "flow_ctl_filter"
+    }],
+    "retryConfig": {
+      "times":5
+    },
+    "flowCtlConfigs": [{
+      "type": "path",
+      "model" : "distributed",
+      "value" : "/http-server/ping",
+      "config": {
+        "duration": 20,
+        "permits": 2
+      }
+    }]
+  ,
+    "hystrixConfigs": [{
+      "path": "/http-server/ping",
+      "timeoutInMilliseconds": 5000,
+      "threadCoreSize": 2,
+      "fallbackResponse": "熔断超时"
+    }]
+  },
+    {
+      "id" : "http-user",
+      "name" : "http-user",
+      "protocol" : "http",
+      "serviceId" : "backend-http-server",
+      "prefix" : "/user",
+      "paths": [
+        "/http-server/ping","/user/update","/http-server111/ping"
+      ],
+      "filterConfigs": [{
+        "id": "load_balance_filter",
+        "config": {
+          "load_balancer": "RoundRobin"
+        }
+      },{
+        "id" : "flow_ctl_filter"
+      }],
+      "retryConfig": {
+        "times":5
+      },
+      "flowCtlConfigs": [{
+        "type": "service",
+        "model" : "distributed",
+        "value" : "/http-server/ping",
+        "config": {
+          "duration": 10,
+          "permits": 5
+        }
+      }]
+    ,
+      "hystrixConfigs": [{
+        "path": "/http-server/ping",
+        "timeoutInMilliseconds": 5000,
+        "threadCoreSize": 2,
+        "fallbackResponse": "熔断超时"
+      }]
+    },{
+      "id" : "user-private",
+      "name" : "user-private",
+      "protocol" : "http",
+      "serviceId" : "backend-user-server",
+      "prefix" : "/user/private",
+      "paths": [
+        "/user/private/user-info"
+      ],
+      "filterConfigs": [{
+        "id": "load_balance_filter",
+        "config": {
+          "load_balancer": "random"
+        }
+      },{
+        "id" : "user_auth_filter"
+      }]
+    }]
+}
