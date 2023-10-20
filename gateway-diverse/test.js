@@ -1,3 +1,4 @@
+// 使用Node.js创建一个简单的HTTP服务器，它监听端口8060，并根据请求的路径返回不同的响应
 var http = require('http');
 var url = require("url");
 var path = require('path');
