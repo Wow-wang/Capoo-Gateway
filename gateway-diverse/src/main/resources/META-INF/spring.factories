@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.wow.gatewaydiverse.nacos.ApiNacosAutoConfiguration,\
+  com.wow.gatewaydiverse.ApiAutoConfiguration,\
+  com.wow.gatewaydiverse.zookeeper.ApiZookeeperAutoConfiguration
+

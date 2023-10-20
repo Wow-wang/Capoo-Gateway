@@ -10,7 +10,9 @@ public enum ResponseCode {
     UNAUTHORIZED(HttpResponseStatus.UNAUTHORIZED, 401, "用户未登录"),
     INTERNAL_ERROR(HttpResponseStatus.INTERNAL_SERVER_ERROR, 1000, "网关内部错误"),
     SERVICE_UNAVAILABLE(HttpResponseStatus.SERVICE_UNAVAILABLE, 2000, "服务暂时不可用,请稍后再试"),
-    
+
+    TIME_UNAVAILABLE(HttpResponseStatus.SERVICE_UNAVAILABLE, 2000, "当前时间不在服务有效期"),
+
     REQUEST_PARSE_ERROR(HttpResponseStatus.BAD_REQUEST, 10000, "请求解析错误, header中必须存在uniqueId参数"),
     REQUEST_PARSE_ERROR_NO_UNIQUEID(HttpResponseStatus.BAD_REQUEST, 10001, "请求解析错误, header中必须存在uniqueId参数"),
     PATH_NO_MATCHED(HttpResponseStatus.NOT_FOUND,10002, "没有找到匹配的路径, 请求快速失败"),

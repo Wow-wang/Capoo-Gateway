@@ -56,12 +56,14 @@ public class Rule implements Comparable<Rule>, Serializable {
     private Integer order;
 
     /**
-     * 规则优先级
+     * 规则优先级 自定义过滤器非全局过滤器
      */
     private Set<FilterConfig> filterConfigs = new HashSet<>();
 
 
     private RetryConfig retryConfig = new RetryConfig();
+
+    private TimeConfig timeConfig = new TimeConfig();
 
     /**
      * 限流熔断配置 使用Set 因为要对多种路径设置限流熔断
@@ -224,6 +226,13 @@ public class Rule implements Comparable<Rule>, Serializable {
         private String fallbackResponse;
     }
 
+    @Data
+    public static class TimeConfig{
+        private String pattern;
+        private String after;
+        private String before;
+    }
+
     public Set<HystrixConfig> getHystrixConfigs() {
         return hystrixConfigs;
     }
@@ -240,12 +249,8 @@ public class Rule implements Comparable<Rule>, Serializable {
         this.flowCtlConfigs = flowCtlConfigs;
     }
 
-    @Data
-    public static class SentinelConfig{
-        private String path;
-        private int timeoutInMilliseconds;
-        private String fallbackResponse;
-    }
+
+
 
     /**
      * 向规则里面提供一些新增配置的方法

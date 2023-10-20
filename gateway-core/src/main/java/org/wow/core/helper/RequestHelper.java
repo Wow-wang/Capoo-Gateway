@@ -1,5 +1,6 @@
 package org.wow.core.helper;
 
+import com.alibaba.nacos.common.utils.CollectionUtils;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
@@ -17,7 +18,13 @@ import org.wow.core.request.GatewayRequest;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -122,14 +129,69 @@ public class RequestHelper {
 		String key = serviceId + "." + gateWayRequest.getPath();
 		Rule rule = DynamicConfigManager.getInstance().getRuleByPath(key);
 		if(rule != null){
-			return rule;
+			if(TimeJudge(rule)){
+				return rule;
+			}
+			throw new ResponseException(ResponseCode.PATH_NO_MATCHED);
 		}
 		// Rule Prefix
-		return DynamicConfigManager.getInstance().getRuleByServiceId(serviceId)
+		rule = DynamicConfigManager.getInstance().getRuleByServiceId(serviceId)
 				.stream().filter(r->gateWayRequest.getPath().startsWith(r.getPrefix()))
 				.findAny().orElseThrow(()->new ResponseException(ResponseCode.PATH_NO_MATCHED));
+
+		if(TimeJudge(rule)){
+			return rule;
+		}else{
+			throw new ResponseException(ResponseCode.PATH_NO_MATCHED);
+		}
+
 	}
+	private static Boolean TimeJudge(Rule rule){
+		Rule.TimeConfig timeConfig = rule.getTimeConfig();
+		if(timeConfig != null) {
+			String pattern = timeConfig.getPattern();
+			if (pattern.equals("After")) {
+				LocalDateTime afterTime = LocalDateTime.parse(timeConfig.getAfter(), DateTimeFormatter.ISO_DATE_TIME);
+				LocalDateTime currentDateTime = LocalDateTime.now();
+				if(currentDateTime.isAfter(afterTime)){
+					return true;
+				}
+				throw new ResponseException(ResponseCode.TIME_UNAVAILABLE);
+			} else if (pattern.equals("Before")) {
+				LocalDateTime beforeTime = LocalDateTime.parse(timeConfig.getBefore(), DateTimeFormatter.ISO_DATE_TIME);
+				LocalDateTime currentDateTime = LocalDateTime.now();
+				if(currentDateTime.isBefore(beforeTime)){
+					return true;
+				}
+				throw new ResponseException(ResponseCode.TIME_UNAVAILABLE);
+			} else if (pattern.equals("Between")) {
+				LocalTime startTime = LocalTime.parse(timeConfig.getAfter());
+				LocalTime endTime = LocalTime.parse(timeConfig.getBefore());
+				LocalTime currentTime = LocalTime.now();
+				if (isWithinTimeRange(startTime, endTime, currentTime)){
+					return true;
+				}
+				throw new ResponseException(ResponseCode.TIME_UNAVAILABLE);
+			}
+		}
+
+		return true;
+	}
+	public static boolean isWithinTimeRange(LocalTime startTime, LocalTime endTime, LocalTime currentTime) {
+		return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
+	}
+	public static void main(String[] args) throws ParseException {
+		String dateTimeString = "2023-10-17T08:30:00";
+
+		try {
+			// 将字符串解析为 LocalDateTime
+			LocalTime startTime = LocalTime.parse("08:00");
+			System.out.println(startTime);
 
 
+		} catch (Exception e) {
+			System.err.println("无法解析日期时间字符串: " + e.getMessage());
+		}
 
+	}
 }

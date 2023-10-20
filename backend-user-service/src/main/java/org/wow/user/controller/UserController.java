@@ -20,6 +20,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
+/**
+ * @author wow
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -31,10 +34,10 @@ public class UserController {
 
     @ApiInvoker(path = "/login")
     @PostMapping("/login")
-    public UserInfo login(@RequestParam("phoneNumber") String phoneNumer,
+    public UserInfo login(@RequestParam("phoneNumber") String phoneNumber,
                           @RequestParam("code") String code,
                           HttpServletResponse response) {
-        User user = userService.login(phoneNumer, code);
+        User user = userService.login(phoneNumber, code);
         var jwt = Jwts.builder()
             .setSubject(String.valueOf(user.getId()))
             .setIssuedAt(new Date())

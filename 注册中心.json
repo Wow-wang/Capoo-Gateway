@@ -56,6 +56,12 @@
       "retryConfig": {
         "times":5
       },
+      "timeConfig": {
+        "pattern" : "between",
+        "after" : "8:00",
+        "before": "17:00"
+      }
+      ,
       "flowCtlConfigs": [{
         "type": "service",
         "model" : "distributed",
