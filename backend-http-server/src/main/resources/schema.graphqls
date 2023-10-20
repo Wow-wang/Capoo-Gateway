@@ -1,0 +1,26 @@
+schema {
+    query: Query,
+}
+ 
+type Query {
+    # 获取具体的用户
+    getUserById(id:Int) : User
+    # 获取具体的博客
+    getPostById(id:Int) : Post
+}
+ 
+type User {
+    userId : ID!,
+    userName : String,
+    realName : String,
+    email : String,
+    posts : [Post],
+}
+ 
+type Post {
+    postId : ID!,
+    title : String!,
+    text : String,
+    category: String
+    user: User,
+}

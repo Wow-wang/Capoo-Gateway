@@ -86,8 +86,9 @@ public class Bootstrap {
             return new RuntimeException("not found RegisterCenter impl");
         });
 
-        // 设置Zookeeper or Nacos
+        // TODO 设置Zookeeper or Nacos
         registerCenter.init(config.getZookeeperRegistryAddress(), config.getEnv());
+        //registerCenter.init(config.getNacosRegistryAddress(), config.getEnv());
 
 
         //构造网关服务定义和服务实例

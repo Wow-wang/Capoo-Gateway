@@ -3,6 +3,8 @@
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/agteway-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/agteway-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend-HTTP-Heterogeneous/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend-HTTP-Heterogeneous/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend-dubbo-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend-dubbo-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend-http-server/src/main/java" charset="UTF-8" />
@@ -22,6 +24,8 @@
     <file url="file://$PROJECT_DIR$/gateway-config-center/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-diverse/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-diverse/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-register-center/gateway-register-center-nacos-impl/src/main/java" charset="UTF-8" />

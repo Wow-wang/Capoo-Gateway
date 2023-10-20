@@ -68,7 +68,8 @@ public class Config {
 
     private int processThread = Runtime.getRuntime().availableProcessors()/4;
 
-    private String waitStrategy = "blocking";
+
+    private String waitStrategy = "busySpin";
 
 
 
