@@ -36,7 +36,7 @@ public class GatewayRequest implements IGatewayRequest{
 
 
     /**
-     * 服务唯一ID
+     * 服务唯一ID 包含版本信息
      */
     @Getter
     private final String uniqueId;

@@ -55,6 +55,9 @@ public class NettyCoreProcessor implements NettyProcessor{
         ChannelHandlerContext ctx = wrapper.getCtx();
 
         try {
+            /**
+             * 设定 Rule
+             */
             GatewayContext gatewayContext = RequestHelper.doContext(request, ctx);
 
             /**

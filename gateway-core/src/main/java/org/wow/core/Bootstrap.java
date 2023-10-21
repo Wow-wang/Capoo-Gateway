@@ -7,6 +7,7 @@ import org.wow.common.config.ServiceDefinition;
 import org.wow.common.config.ServiceInstance;
 import org.wow.common.utils.NetUtils;
 import org.wow.common.utils.TimeUtil;
+import org.wow.core.filter.GatewayFilterChainFactory;
 import org.wow.gateway.config.center.api.ConfigCenter;
 import org.wow.gateway.register.center.api.RegisterCenter;
 import org.wow.gateway.register.center.api.RegisterCenterListener;
@@ -56,10 +57,10 @@ public class Bootstrap {
          * Lambda 表达式 (rules -> DynamicConfigManager.getInstance().putAllRule(rules))
          * 作为回调函数传递给了 listener，以便在规则变更时调用它
          */
-        configCenter.subscribeRulesChange(rules -> DynamicConfigManager.getInstance()
-                .putAllRule(rules));
-
-
+        configCenter.subscribeRulesChange(rules ->{
+            // 每次更新Rule需要立即清除缓存
+            GatewayFilterChainFactory.getInstance().getChainCache().invalidateAll();
+            DynamicConfigManager.getInstance().putAllRule(rules);});
         // 启动容器
         Container container = new Container(config);
         container.start();

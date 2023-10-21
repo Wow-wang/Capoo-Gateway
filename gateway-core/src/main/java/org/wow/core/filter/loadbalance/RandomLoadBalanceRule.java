@@ -30,6 +30,9 @@ public class RandomLoadBalanceRule implements IGatewayLoadBalanceRule{
         this.serviceId = serviceId;
     }
 
+    /**
+     * 缓存 负载均衡策略
+     */
     private static ConcurrentHashMap<String,RandomLoadBalanceRule> serviceMap = new ConcurrentHashMap<>();
 
     public static RandomLoadBalanceRule getInstance(String serviceId){
@@ -42,18 +45,18 @@ public class RandomLoadBalanceRule implements IGatewayLoadBalanceRule{
     }
     @Override
     public ServiceInstance choose(GatewayContext ctx) {
-        String serviceId = ctx.getUniqueId();
-        return choose(serviceId, ctx.isGray());
+        String uniqueId = ctx.getUniqueId();
+        return choose(uniqueId, ctx.isGray());
     }
 
     @Override
-    public ServiceInstance choose(String serviceId, boolean gray) {
-        serviceInstanceSet = DynamicConfigManager.getInstance().getServiceInstanceByUniqueId(serviceId,gray);
+    public ServiceInstance choose(String uniqueId, boolean gray) {
+        serviceInstanceSet = DynamicConfigManager.getInstance().getServiceInstanceByUniqueId(uniqueId,gray);
         if(serviceInstanceSet.isEmpty()){
-            serviceInstanceSet = DynamicConfigManager.getInstance().getServiceInstanceByUniqueId(serviceId,gray);
+            serviceInstanceSet = DynamicConfigManager.getInstance().getServiceInstanceByUniqueId(uniqueId,gray);
         }
         if(serviceInstanceSet.isEmpty()){
-            log.warn("No instance available for : {}", serviceId);
+            log.warn("No instance available for : {}", uniqueId);
             throw new NotFoundException(ResponseCode.SERVICE_INSTANCE_NOT_FOUND);
         }
         List<ServiceInstance> instances = new ArrayList<ServiceInstance>(serviceInstanceSet);

@@ -60,6 +60,8 @@ public class ConfigLoader {
         return config;
     }
 
+    // java -jar YourApp.jar --port=8080 --host=localhost
+
     private void loadFromArgs(String[] args) {
         // --port=1234
         if(args != null && args.length > 0){
@@ -74,11 +76,13 @@ public class ConfigLoader {
         }
     }
 
+
     private void loadFromJvm() {
         Properties properties = System.getProperties();
         PropertiesUtils.properties2Object(properties,config,JVM_PREFIX);
     }
 
+    // export ENV_VARIABLE="my_value"
     private void loadFromEnv() {
         Map<String,String> env = System.getenv();
         Properties properties = new Properties();
@@ -86,7 +90,7 @@ public class ConfigLoader {
         PropertiesUtils.properties2Object(properties,config,ENV_PREFIX);
     }
 
-    private void    loadFromConfigFile(){
+    private void loadFromConfigFile(){
         // 相对路径解析
         InputStream inputStream = ConfigLoader.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
         if(inputStream != null){
@@ -94,7 +98,11 @@ public class ConfigLoader {
             try{
                 properties.load(inputStream);
 
-                // 该方法的作用是将属性(Properties)转换为对象(Object)
+                /**
+                 * 该方法的作用是将属性(Properties)转换为对象(Object)
+                 * 如果 config 中已经存在相同属性名的字段，那么该字段的值将被 properties 中的值覆盖，
+                 * 否则将保留 config 中的默认值。
+                  */
                 PropertiesUtils.properties2Object(properties,config);
             } catch (IOException e) {
                 log.warn("load config file {} error",CONFIG_FILE,e);
