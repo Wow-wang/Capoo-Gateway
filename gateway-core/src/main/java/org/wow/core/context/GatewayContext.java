@@ -119,6 +119,7 @@ public class GatewayContext extends BasicContext{
     /**
      * 重写父类释放资源 真正释放
      */
+    @Override
     public void releaseRequest(){
         if(requestReleased.compareAndSet(false,true)){
             ReferenceCountUtil.release(request.getFullHttpRequest());

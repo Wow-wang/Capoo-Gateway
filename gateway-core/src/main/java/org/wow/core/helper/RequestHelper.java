@@ -77,7 +77,8 @@ public class RequestHelper {
 	private static GatewayRequest doRequest(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx) {
 		
 		HttpHeaders headers = fullHttpRequest.headers();
-		//	从header头获取必须要传入的关键属性 uniqueId
+
+		//	从header头获取必须要传入的关键属性 uniqueId = serviceId + version
 		String uniqueId = headers.get(GatewayConst.UNIQUE_ID);
 		
 		String host = headers.get(HttpHeaderNames.HOST);
@@ -104,6 +105,7 @@ public class RequestHelper {
 	 * 获取客户端ip
 	 */
 	private static String getClientIp(ChannelHandlerContext ctx, FullHttpRequest request) {
+		// X-Forwarded-For 是一个 HTTP 请求头部字段  一般不设置
 		String xForwardedValue = request.headers().get(BasicConst.HTTP_FORWARD_SEPARATOR);
 		
 		String clientIp = null;
@@ -114,6 +116,7 @@ public class RequestHelper {
 			}
 		}
 		if(clientIp == null) {
+			// 从底层的网络连接中获取客户端的 IP 地址
 			InetSocketAddress inetSocketAddress = (InetSocketAddress)ctx.channel().remoteAddress();
 			clientIp = inetSocketAddress.getAddress().getHostAddress();
 		}
@@ -122,6 +125,7 @@ public class RequestHelper {
 
 	/**
 	 * 获取Rule对象
+	 * 匹配规则 服务 + 路径
 	 * @param gateWayRequest
 	 * @return
 	 */
@@ -180,6 +184,8 @@ public class RequestHelper {
 	public static boolean isWithinTimeRange(LocalTime startTime, LocalTime endTime, LocalTime currentTime) {
 		return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
 	}
+
+
 	public static void main(String[] args) throws ParseException {
 		String dateTimeString = "2023-10-17T08:30:00";
 

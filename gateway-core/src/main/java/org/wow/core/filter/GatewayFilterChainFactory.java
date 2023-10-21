@@ -2,6 +2,7 @@ package org.wow.core.filter;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.wow.common.config.Rule;
@@ -27,6 +28,7 @@ public class GatewayFilterChainFactory implements FilterFactory {
         private static final GatewayFilterChainFactory INSTANCE = new GatewayFilterChainFactory();
     }
 
+    @Getter
     private Cache<String,GatewayFilterChain> chainCache = Caffeine.newBuilder().recordStats().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     public static GatewayFilterChainFactory getInstance(){

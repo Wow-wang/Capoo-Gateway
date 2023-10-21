@@ -89,7 +89,9 @@ public class ApiAnnotationScanner {
                         break;
                 }
             }
-
+            /**
+             *
+             */
             serviceDefinition.setUniqueId(serviceId + BasicConst.COLON_SEPARATOR + version);
             serviceDefinition.setServiceId(serviceId);
             serviceDefinition.setVersion(version);
