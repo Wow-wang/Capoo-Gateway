@@ -1,10 +1,10 @@
-# Capoo 网关
+# Capoo gateway
 
-## 核心功能
-1. 运用领域模型构建基于Netty的网关核心启动容器，多粒度路由谓词工厂，请求转发响应与插件过滤全异步化处理；针对注册中心和配置中心具有nacos zookeeper多种选择
-2. 基于Springboot实现自动装配HTTP  Dubbo多种协议下游服务，定时健康检查以融合异构微服务。
-3. 运用工厂模式+责任链模式构建插拔式动态过滤器链条，使用caffeine缓存链条提高并发能力，并实现了以下过滤器功能：多种负载均衡策略，Ratelimiter实现本地限流和Redis+lua实现分布式限流（支持服务、路径多种限流），异常重试处理，采用Hystrix线程隔离实现熔断保护，灰度分流与版本环境控制，采用jwt实现用户鉴权，并支持接口mock方便前端联调。
-4. 运用Prometheus等实时多维度监控，skywalking分布式链路追踪。通过线程数与JVM调优，并且采用Disrupotor辅助Netty，支持流量高峰时高可用
+## Main Features
+1. using domain model to build Netty-based gateway core startup container, multi-granular routing predicate factory, request forwarding response and plug-in filtering full asynchronous processing; for the registration center and configuration center with nacos zookeeper a variety of options
+2. Based on Springboot to achieve automatic assembly of HTTP Dubbo multiple protocols downstream services, regular health checks to integrate heterogeneous microservices.
+3. using the factory pattern + chain of responsibility pattern to build plug-and-play dynamic filter chain, using caffeine cache chain to improve concurrency, and implement the following filter functions: multiple load balancing strategies, Ratelimiter to achieve local flow restriction and Redis + lua to achieve distributed flow restriction (support services, paths, multiple flow restriction), exception retry processing, using the Hystrix thread isolation. Hystrix thread isolation to achieve meltdown protection, grayscale streaming and version environment control, using jwt to achieve user authentication, and support interface mock to facilitate front-end coordination.
+4. using Prometheus and other real-time multi-dimensional monitoring, skywalking distributed link tracking. Through the number of threads and JVM tuning , and the use of Disrupotor auxiliary Netty, to support high availability during peak traffic .
 
-## 附属功能
-支持下游服务只接受网关消息 
+## Other Feacher
+Support for downstream services to accept only gateway messages(Spring Security)
