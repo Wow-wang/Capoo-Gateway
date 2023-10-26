@@ -20,10 +20,13 @@ public class Config {
 
     private String applicationName = "api-gateway";
 
-    // 自己调整
-    private String ZookeeperRegistryAddress = "192.168.220.131:2181";
 
-    private String NacosRegistryAddress = "127.0.0.1:8848";
+    // 自己调整
+    private String zookeeperRegistryAddress = "192.168.220.131:2181";
+
+    private String nacosRegistryAddress = "127.0.0.1:8848";
+
+    private String registryAddress = zookeeperRegistryAddress;
 
     private String env = "dev";
 

@@ -68,7 +68,7 @@ public class LoadBalanceFilter implements Filter {
                 if(filterId.equals(LOAD_BALANCE_FILTER_ID)){
                     String config = filterConfig.getConfig();
                     String strategy = "LOAD_BALANCE_STRATEGY_RANDOM"; // 默认策略是随机
-                    if(StringUtils.isEmpty(config)){
+                    if(!StringUtils.isEmpty(config)){
                         Map<String,String> mayTypeMap = JSON.parseObject(config,Map.class);
                         strategy = mayTypeMap.get(LOAD_BALANCE_KEY);
                     }
