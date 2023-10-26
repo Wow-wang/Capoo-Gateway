@@ -29,7 +29,7 @@ public interface FilterConst {
     String LOAD_BALANCE_KEY = "load_balancer";
     String LOAD_BALANCE_STRATEGY_RANDOM = "Random";
     String LOAD_BALANCE_STRATEGY_ROUND_ROBIN = "RoundRobin";
-
+    String LOAD_BALANCE_STRATEGY_LEAST_ACTIVE = "LeastActive";
 
     String ROUTER_FILTER_ID = "router_filter";
     String ROUTER_FILTER_NAME = "router_filter";

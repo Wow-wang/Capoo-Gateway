@@ -79,6 +79,9 @@ public class LoadBalanceFilter implements Filter {
                         case LOAD_BALANCE_STRATEGY_ROUND_ROBIN:
                             loadBalanceRule = RoundRobinLoadBalanceRule.getInstance(configRule.getServiceId());
                             break;
+                        case LOAD_BALANCE_STRATEGY_LEAST_ACTIVE:
+                            loadBalanceRule = LeastActiveLoadBalanceRule.getInstance(configRule.getServiceId());
+                            break;
                         default:
                             log.warn("No loadBalance strategy for service:{}", strategy);
                             loadBalanceRule = RandomLoadBalanceRule.getInstance(configRule.getServiceId());

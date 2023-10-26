@@ -57,7 +57,7 @@ public class RoundRobinLoadBalanceRule implements IGatewayLoadBalanceRule{
     private ConcurrentMap<String, ConcurrentMap<String, WeightedRoundRobin>> methodWeightMap = new ConcurrentHashMap<String, ConcurrentMap<String, WeightedRoundRobin>>();
 
 
-    private AtomicInteger position = new AtomicInteger(1);
+//    private AtomicInteger position = new AtomicInteger(1);
 
     private final String serviceId;
 
@@ -110,7 +110,7 @@ public class RoundRobinLoadBalanceRule implements IGatewayLoadBalanceRule{
         WeightedRoundRobin selectedWRR = null;
         for (ServiceInstance instance : instances) {
             String serviceInstanceId = instance.getServiceInstanceId();
-            int weight = instance.getWeight();
+            int weight = instance.getWarmWeight();
             WeightedRoundRobin weightedRoundRobin = map.computeIfAbsent(serviceInstanceId, k -> {
                 WeightedRoundRobin wrr = new WeightedRoundRobin();
                 wrr.setWeight(weight);

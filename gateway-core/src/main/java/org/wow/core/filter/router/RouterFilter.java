@@ -1,7 +1,9 @@
 package org.wow.core.filter.router;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.BiConsumer;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.netflix.hystrix.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.skywalking.apm.toolkit.trace.TraceCrossThread;
@@ -17,17 +19,19 @@ import org.wow.core.ConfigLoader;
 import org.wow.core.context.GatewayContext;
 import org.wow.core.filter.Filter;
 import org.wow.core.filter.FilterAspect;
+import org.wow.core.filter.loadbalance.LeastActiveLoadBalanceRule;
+import org.wow.core.filter.loadbalance.RoundRobinLoadBalanceRule;
 import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
 import org.wow.core.response.GatewayResponse;
 import sun.misc.Unsafe;
 
 import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 import static org.wow.common.constants.FilterConst.*;
 
@@ -181,6 +185,7 @@ public class RouterFilter implements Filter {
      */
     private void complete(Request request, Response response, Throwable throwable, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
         try {
+
             log.info("complete");
             // 重试
             Rule rule = gatewayContext.getRule();
@@ -193,6 +198,7 @@ public class RouterFilter implements Filter {
                 doRetry(gatewayContext,currentRetryTimes);
                 return;
             }
+
 
 
             if(Objects.nonNull(throwable)){
@@ -218,6 +224,7 @@ public class RouterFilter implements Filter {
             gatewayContext.written();
             ResponseHelper.writeResponse(gatewayContext);
 
+            updateActive(gatewayContext);
             accessLog.info("{} {} {} {} {} {} {}",
                     System.currentTimeMillis() - gatewayContext.getRequest().getBeginTime(),
                     gatewayContext.getRequest().getClientIp(),
@@ -227,6 +234,32 @@ public class RouterFilter implements Filter {
                     gatewayContext.getResponse().getHttpResponseStatus().code(),
                     gatewayContext.getResponse().getFutureResponse().getResponseBodyAsBytes().length);
 
+        }
+    }
+
+    private void updateActive(GatewayContext gatewayContext) {
+        Rule rule = gatewayContext.getRule();
+        Set<Rule.FilterConfig> filterConfigs = gatewayContext.getRule().getFilterConfigs();
+        Iterator iterator = filterConfigs.iterator();
+        Rule.FilterConfig filterConfig;
+        while(iterator.hasNext()){
+            filterConfig = (Rule.FilterConfig)iterator.next();
+            if(filterConfig == null){
+                continue;
+            }
+            String filterId = filterConfig.getId();
+            if(filterId.equals(LOAD_BALANCE_FILTER_ID)) {
+                String config = filterConfig.getConfig();
+                if(!org.apache.commons.lang3.StringUtils.isEmpty(config)){
+                    Map<String,String> mayTypeMap = JSON.parseObject(config,Map.class);
+                    if(mayTypeMap.get(LOAD_BALANCE_KEY).equals(LOAD_BALANCE_STRATEGY_LEAST_ACTIVE)){
+                        // 并发数减少
+                        LeastActiveLoadBalanceRule.getInstance(rule.getServiceId()).getActiveCache()
+                                .get(gatewayContext.getRequest().getModifyHost(),k->{return new LongAdder();})
+                                .decrement();
+                    }
+                }
+            }
         }
     }
 
