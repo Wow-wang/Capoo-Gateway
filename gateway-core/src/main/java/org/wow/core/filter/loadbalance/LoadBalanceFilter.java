@@ -35,6 +35,7 @@ public class LoadBalanceFilter implements Filter {
     public void doFilter(GatewayContext ctx) throws Exception {
         String serviceId = ctx.getUniqueId();
         IGatewayLoadBalanceRule gatewayLoadBalanceRule = getLoadBalanceRule(ctx);
+        if(gatewayLoadBalanceRule == null) return;
         ServiceInstance serviceInstance = gatewayLoadBalanceRule.choose(serviceId,ctx.isGray());
         GatewayRequest request = ctx.getRequest();
         if(serviceInstance != null && request != null){
@@ -68,8 +69,9 @@ public class LoadBalanceFilter implements Filter {
                 if(filterId.equals(LOAD_BALANCE_FILTER_ID)){
                     String config = filterConfig.getConfig();
                     String strategy = "LOAD_BALANCE_STRATEGY_RANDOM"; // 默认策略是随机
+                    Map<String,String> mayTypeMap = null;
                     if(!StringUtils.isEmpty(config)){
-                        Map<String,String> mayTypeMap = JSON.parseObject(config,Map.class);
+                        mayTypeMap = JSON.parseObject(config,Map.class);
                         strategy = mayTypeMap.get(LOAD_BALANCE_KEY);
                     }
                     switch (strategy) {
@@ -81,6 +83,11 @@ public class LoadBalanceFilter implements Filter {
                             break;
                         case LOAD_BALANCE_STRATEGY_LEAST_ACTIVE:
                             loadBalanceRule = LeastActiveLoadBalanceRule.getInstance(configRule.getServiceId());
+                            break;
+                        case LOAD_BALANCE_CONSISTENT:
+                            loadBalanceRule = null;
+                            String host = mayTypeMap.get(HOST);
+                            ctx.getRequest().setModifyHost(host);
                             break;
                         default:
                             log.warn("No loadBalance strategy for service:{}", strategy);

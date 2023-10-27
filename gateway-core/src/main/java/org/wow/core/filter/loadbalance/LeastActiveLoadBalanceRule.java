@@ -62,18 +62,18 @@ public class LeastActiveLoadBalanceRule implements IGatewayLoadBalanceRule{
     }
 
     @Override
-    public ServiceInstance choose(String serviceId, boolean gray) {
-        serviceInstanceSet = DynamicConfigManager.getInstance().getServiceInstanceByUniqueId(serviceId,gray);
+    public ServiceInstance choose(String uniqueId, boolean gray) {
+        serviceInstanceSet = DynamicConfigManager.getInstance().getServiceInstanceByUniqueId(uniqueId,gray);
         if(serviceInstanceSet.isEmpty()){
-            log.warn("No instance available for : {}", serviceId);
+            log.warn("No instance available for : {}", uniqueId);
             throw new NotFoundException(ResponseCode.SERVICE_INSTANCE_NOT_FOUND);
         }
         List<ServiceInstance> instances = new ArrayList<ServiceInstance>(serviceInstanceSet);
         if(instances.isEmpty()){
-            log.warn("No instance available for service: {}", serviceId);
+            log.warn("No instance available for service: {}", uniqueId);
             return null;
         }else{
-            return doSelect(serviceId,instances);
+            return doSelect(uniqueId,instances);
         }
     }
 

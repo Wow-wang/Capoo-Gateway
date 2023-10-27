@@ -170,6 +170,7 @@ public class Rule implements Comparable<Rule>, Serializable {
          */
         private String config;
 
+
         public String getId() {
             return id;
         }
