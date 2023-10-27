@@ -41,7 +41,7 @@ public class LeastActiveLoadBalanceRule implements IGatewayLoadBalanceRule{
 
     // key : serviceInstanceId  value: 并发数
     @Getter
-    public Cache<String, LongAdder> activeCache = Caffeine.newBuilder().recordStats().expireAfterWrite(10, TimeUnit.SECONDS).build();
+    public static Cache<String, LongAdder> activeCache = Caffeine.newBuilder().recordStats().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     /**
      * 缓存 负载均衡策略
@@ -102,6 +102,8 @@ public class LeastActiveLoadBalanceRule implements IGatewayLoadBalanceRule{
             int active = activeCache.get(instance.getServiceInstanceId(),k->{return new LongAdder();}).intValue();
             // 计算权重值
             int weight = instance.getWarmWeight(); // Weight
+            // 高权重能拥有更多的并发数
+            active = active/weight;
 
             // 第一个元素的后    或者 当前instance并发数 小于 最小并发数（初始值是-1）
             if (leastActive == -1 || active < leastActive) {

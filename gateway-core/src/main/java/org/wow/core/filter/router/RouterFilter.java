@@ -12,17 +12,22 @@ import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wow.common.config.Rule;
+import org.wow.common.config.ServiceInstance;
+import org.wow.common.constants.FilterConst;
 import org.wow.common.enums.ResponseCode;
 import org.wow.common.exception.ConnectException;
+import org.wow.common.exception.NotFoundException;
 import org.wow.common.exception.ResponseException;
 import org.wow.core.ConfigLoader;
 import org.wow.core.context.GatewayContext;
 import org.wow.core.filter.Filter;
 import org.wow.core.filter.FilterAspect;
+import org.wow.core.filter.GatewayFilterChainFactory;
 import org.wow.core.filter.loadbalance.LeastActiveLoadBalanceRule;
 import org.wow.core.filter.loadbalance.RoundRobinLoadBalanceRule;
 import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
+import org.wow.core.request.GatewayRequest;
 import org.wow.core.response.GatewayResponse;
 import sun.misc.Unsafe;
 
@@ -148,33 +153,33 @@ public class RouterFilter implements Filter {
      * 可有可无
      */
 //    @TraceCrossThread
-    public class CompleteBiConsumer implements BiConsumer<Response,Throwable>{
-        private Request request;
-        private Response response;
-
-        private Throwable throwable;
-        private GatewayContext gatewayContext;
-
-        private Optional<Rule.HystrixConfig> hystrixConfig;
-
-        public CompleteBiConsumer(Request request, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
-            this.request = request;
-            this.gatewayContext = gatewayContext;
-            this.hystrixConfig = hystrixConfig;
-        }
-
-        @Override
-        public void accept(Response response, Throwable throwable) {
-            this.response = response;
-            this.throwable = throwable;
-            this.run();
-        }
-
-        public void run(){
-            //skywalking 会通过 @TraceCrossThread会增强run方法
-            complete(request,response,throwable,gatewayContext, hystrixConfig);
-        }
-    }
+//    public class CompleteBiConsumer implements BiConsumer<Response,Throwable>{
+//        private Request request;
+//        private Response response;
+//
+//        private Throwable throwable;
+//        private GatewayContext gatewayContext;
+//
+//        private Optional<Rule.HystrixConfig> hystrixConfig;
+//
+//        public CompleteBiConsumer(Request request, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
+//            this.request = request;
+//            this.gatewayContext = gatewayContext;
+//            this.hystrixConfig = hystrixConfig;
+//        }
+//
+//        @Override
+//        public void accept(Response response, Throwable throwable) {
+//            this.response = response;
+//            this.throwable = throwable;
+//            this.run();
+//        }
+//
+//        public void run(){
+//            //skywalking 会通过 @TraceCrossThread会增强run方法
+//            complete(request,response,throwable,gatewayContext, hystrixConfig);
+//        }
+//    }
 
     /**
      * 释放request 记录response
@@ -267,9 +272,24 @@ public class RouterFilter implements Filter {
         System.out.println("当前重试次数"+currentRetryTimes);
         gatewayContext.setCurrentRetryTimes(currentRetryTimes + 1);
         try {
+            chooseNewInstance(gatewayContext);
             doFilter(gatewayContext);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void chooseNewInstance(GatewayContext gatewayContext) {
+        String serviceId = gatewayContext.getRule().getServiceId();
+        RoundRobinLoadBalanceRule loadBalance = RoundRobinLoadBalanceRule.getInstance(serviceId);
+        ServiceInstance serviceInstance = loadBalance.choose(serviceId, gatewayContext.isGray());
+        GatewayRequest request = gatewayContext.getRequest();
+        if(serviceInstance != null && request != null){
+            String host = serviceInstance.getIp() + ":" + serviceInstance.getPort();
+            request.setModifyHost(host);
+        }else{
+            log.warn("No instance available for : {}" , serviceId);
+            throw new NotFoundException(ResponseCode.SERVICE_INSTANCE_NOT_FOUND);
         }
     }
 }
