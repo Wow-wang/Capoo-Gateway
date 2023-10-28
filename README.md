@@ -1,10 +1,38 @@
-# Capoo gateway
+# Capoo 网关
 
-## Main Features
-1. using domain model to build Netty-based gateway core startup container, multi-granular routing predicate factory, request forwarding response and plug-in filtering full asynchronous processing; for the registration center and configuration center with nacos zookeeper a variety of options
-2. Based on Springboot to achieve automatic assembly of HTTP Dubbo multiple protocols downstream services, regular health checks to integrate heterogeneous microservices.
-3. using the factory pattern + chain of responsibility pattern to build plug-and-play dynamic filter chain, using caffeine cache chain to improve concurrency, and implement the following filter functions: multiple load balancing strategies, Ratelimiter to achieve local flow restriction and Redis + lua to achieve distributed flow restriction (support services, paths, multiple flow restriction), exception retry processing, using the Hystrix thread isolation. Hystrix thread isolation to achieve meltdown protection, grayscale streaming and version environment control, using jwt to achieve user authentication, and support interface mock to facilitate front-end coordination.
-4. using Prometheus and other real-time multi-dimensional monitoring, skywalking distributed link tracking. Through the number of threads and JVM tuning , and the use of Disrupotor auxiliary Netty, to support high availability during peak traffic .
 
-## Other Feacher
-Support for downstream services to accept only gateway messages(Spring Security)
+
+## 项目设计
+
+- 运用DDD构建基于Netty的网关核心启动容器，使用AsyncHttpClient实现异步转发
+- 运用SPI模式+责任链模式构建插拔式动态过滤器链条，使用caffeine缓存链条提高并发能力
+- 采用Disrupotor辅助Netty，支持流量高峰时高可用
+- 请求转发响应与插件过滤全异步化处理
+- 整合Spring，实现服务快速接入网关
+- ...
+
+
+
+## 项目功能
+
+- 路由谓词工厂：实现多粒度路由谓词工厂，检查请求的时间，支持请求进行全路径匹配、前缀路径匹配路由规则
+- 负载均衡：支持权重随机、权重轮询 、最低活跃负载均衡，保障服务预热
+- 统一鉴权：支持JWT授权方式 
+- 协议转换：通过协议转换整合后台基于REST，Dubbo等不同协议微服务
+- 异构服务接入：自研中间件Tutu通过定时健康检查机制，实现融合异构下游微服务，如Node.js
+- 注册中心和服务中心：支持Nacos ZooKeeper多选择，实现节点无状态，配置信息自动同步，节点水平拓展
+- 多粒度限流：RateLimiter本地限流，Redis实现分布式限流，细颗粒度的限流方式包含服务限流，接口限流
+- 熔断降级：Hystrix线程隔离实现熔断保护，定时检查恢复服务
+- 多维度监控：采用Prometheus插入链条监控，skywalking分布式链路追踪, 日志审计
+- 灰度发布与版本环境控制：控制范围为环境>服务定义>版本>灰度
+- 服务异常处理机制：支持Failover、Failfast、Failsafe
+- Mock接口：方便前端联调
+- ...
+
+
+
+## 项目计划 (10/28)
+
+- 统一鉴权扩展basic-auth，key-auth，黑白名单
+- 完善协议转换
+- ...
