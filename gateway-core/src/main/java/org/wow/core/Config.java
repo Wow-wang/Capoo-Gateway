@@ -26,11 +26,12 @@ public class Config {
 
     private String nacosRegistryAddress = "127.0.0.1:8848";
 
+
     private String registryAddress = zookeeperRegistryAddress;
 
     private String env = "dev";
 
-    private String register = "zookeeper";
+    private String registerName = "zookeeper";
 
     //netty
 

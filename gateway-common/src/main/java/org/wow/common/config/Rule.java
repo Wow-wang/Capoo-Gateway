@@ -32,6 +32,7 @@ public class Rule implements Comparable<Rule>, Serializable {
     /**
      * 规则对应的协议
      */
+    @Getter
     private String protocol;
 
     /**

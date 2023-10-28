@@ -54,7 +54,6 @@ public class RequestHelper {
 		// 根据请求对象获取规则
 		Rule rule = getRule(gateWayRequest,serviceDefinition.getServiceId());
 
-		
 		//	构建我们而定GateWayContext对象
 		GatewayContext gatewayContext = new GatewayContext(
 				serviceDefinition.getProtocol(),
@@ -181,6 +180,7 @@ public class RequestHelper {
 
 		return true;
 	}
+
 	public static boolean isWithinTimeRange(LocalTime startTime, LocalTime endTime, LocalTime currentTime) {
 		return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
 	}

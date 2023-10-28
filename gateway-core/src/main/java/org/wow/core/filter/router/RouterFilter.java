@@ -149,6 +149,10 @@ public class RouterFilter implements Filter {
         return future;
     }
 
+    private void routeHttpToDubbo(GatewayContext gatewayContext,Optional<Rule.HystrixConfig> hystrixConfig){
+
+    }
+
     /**
      * 可有可无
      */

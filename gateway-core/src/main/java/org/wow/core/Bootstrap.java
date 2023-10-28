@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.wow.common.config.DynamicConfigManager;
 import org.wow.common.config.ServiceDefinition;
 import org.wow.common.config.ServiceInstance;
+import org.wow.common.spi.ExtensionLoader;
 import org.wow.common.utils.NetUtils;
 import org.wow.common.utils.TimeUtil;
 import org.wow.core.filter.GatewayFilterChainFactory;
@@ -83,11 +84,14 @@ public class Bootstrap {
     }
 
     private static RegisterCenter registerAndSubscribe(Config config) {
-        ServiceLoader<RegisterCenter> serviceLoader = ServiceLoader.load(RegisterCenter.class);
-        final RegisterCenter registerCenter = serviceLoader.findFirst().orElseThrow(() -> {
-            log.error("not found RegisterCenter impl");
-            return new RuntimeException("not found RegisterCenter impl");
-        });
+        ExtensionLoader<RegisterCenter> loader = ExtensionLoader.getExtensionLoader(RegisterCenter.class);
+//        ServiceLoader<RegisterCenter> serviceLoader = ServiceLoader.load(RegisterCenter.class);
+//        final RegisterCenter registerCenter = serviceLoader.findFirst().orElseThrow(() -> {
+//            log.error("not found RegisterCenter impl");
+//            return new RuntimeException("not found RegisterCenter impl");
+//        });
+        String registerName = config.getRegisterName();
+        RegisterCenter registerCenter = loader.getExtension(registerName);
 
         // TODO 设置Zookeeper or Nacos
         registerCenter.init(config.getRegistryAddress(), config.getEnv());

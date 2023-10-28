@@ -1,8 +1,10 @@
 package org.wow.gateway.register.center.api;
 
+import org.wow.common.annotation.SPI;
 import org.wow.common.config.ServiceDefinition;
 import org.wow.common.config.ServiceInstance;
 
+@SPI
 public interface RegisterCenter {
     /**
      * 初始化
