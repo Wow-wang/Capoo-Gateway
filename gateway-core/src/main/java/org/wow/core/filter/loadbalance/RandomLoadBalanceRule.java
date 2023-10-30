@@ -71,7 +71,7 @@ public class RandomLoadBalanceRule implements IGatewayLoadBalanceRule{
         List<Integer> indexes = new ArrayList<>();
         Integer temp = 0;
         for(int i = 0; i < instances.size(); i++){
-            temp += instances.get(0).getWeight();
+            temp += instances.get(i).getWarmWeight();
             indexes.add(temp);
         }
         int index = ThreadLocalRandom.current().nextInt(temp);

@@ -11,7 +11,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
-
 import org.wow.common.constants.BasicConst;
 
 import java.nio.charset.Charset;
@@ -119,7 +118,7 @@ public class GatewayRequest implements IGatewayRequest{
      * 请求对象里面的cookie
      */
     @Getter
-    private Map<String,io.netty.handler.codec.http.cookie.Cookie> cookieMap;
+    private Map<String, Cookie> cookieMap;
 
 
     /**
@@ -127,6 +126,12 @@ public class GatewayRequest implements IGatewayRequest{
      */
     @Getter
     private Map<String, List<String>> postParameters;
+
+    @Getter
+    private String[] parameterTypes;
+
+    @Getter
+    private String[] arguments;
 
 
     /***************** IGatewayRequest:可修改的请求变量 	**********************/
@@ -167,12 +172,12 @@ public class GatewayRequest implements IGatewayRequest{
      * @param fullHttpRequest
      */
     public GatewayRequest(String uniqueId,
-                           Charset charset,
+                          Charset charset,
                           String clientIp, String host,
-                           String uri,
+                          String uri,
                           HttpMethod method, String contentType,
                           HttpHeaders httpHeaders,
-                          FullHttpRequest fullHttpRequest, String rpcMethod) {
+                          FullHttpRequest fullHttpRequest, String rpcMethod,String[] parameterTypes,String[] arguments) {
         this.uniqueId = uniqueId;
         this.rpcMethod = rpcMethod;
         this.beginTime = currentTimeMillis();
@@ -187,6 +192,8 @@ public class GatewayRequest implements IGatewayRequest{
         this.fullHttpRequest = fullHttpRequest;
         this.requestBuilder = new RequestBuilder();
         this.path = queryStringDecoder.path();
+        this.parameterTypes = parameterTypes;
+        this.arguments = arguments;
 
 
         this.modifyHost = host;
@@ -213,12 +220,12 @@ public class GatewayRequest implements IGatewayRequest{
         return body;
     }
 
-    public io.netty.handler.codec.http.cookie.Cookie getCookie(String name){
+    public Cookie getCookie(String name){
         if(cookieMap == null){
-            cookieMap = new HashMap<String,io.netty.handler.codec.http.cookie.Cookie>();
+            cookieMap = new HashMap<String, Cookie>();
             String cookieStr = getHeaders().get(HttpHeaderNames.COOKIE);
-            Set<io.netty.handler.codec.http.cookie.Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieStr);
-            for(io.netty.handler.codec.http.cookie.Cookie cookie : cookies){
+            Set<Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieStr);
+            for(Cookie cookie : cookies){
                 cookieMap.put(name,cookie);
             }
         }

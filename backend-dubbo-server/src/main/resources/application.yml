@@ -1,0 +1,16 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: http-dubbo-server
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+
+
+logging:
+  config: classpath:logback.xml
+

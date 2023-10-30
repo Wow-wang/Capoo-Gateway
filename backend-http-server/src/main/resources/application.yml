@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8085
 api:
   registerAddress: 192.168.220.131:2181
   env: dev

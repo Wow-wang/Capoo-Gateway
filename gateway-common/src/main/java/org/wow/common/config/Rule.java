@@ -32,6 +32,7 @@ public class Rule implements Comparable<Rule>, Serializable {
     /**
      * 规则对应的协议
      */
+    @Getter
     private String protocol;
 
     /**
@@ -169,6 +170,7 @@ public class Rule implements Comparable<Rule>, Serializable {
          * 配置信息
          */
         private String config;
+
 
         public String getId() {
             return id;

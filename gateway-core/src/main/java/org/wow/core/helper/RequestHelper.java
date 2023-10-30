@@ -1,6 +1,5 @@
 package org.wow.core.helper;
 
-import com.alibaba.nacos.common.utils.CollectionUtils;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
@@ -9,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.wow.common.config.*;
 import org.wow.common.constants.BasicConst;
 import org.wow.common.constants.GatewayConst;
-import org.wow.common.constants.GatewayProtocol;
 import org.wow.common.enums.ResponseCode;
 import org.wow.common.exception.ResponseException;
 import org.wow.core.context.GatewayContext;
@@ -19,12 +17,10 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 
@@ -54,7 +50,6 @@ public class RequestHelper {
 		// 根据请求对象获取规则
 		Rule rule = getRule(gateWayRequest,serviceDefinition.getServiceId());
 
-		
 		//	构建我们而定GateWayContext对象
 		GatewayContext gatewayContext = new GatewayContext(
 				serviceDefinition.getProtocol(),
@@ -75,13 +70,30 @@ public class RequestHelper {
 	 *构建Request请求对象
 	 */
 	private static GatewayRequest doRequest(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx) {
-		
+
 		HttpHeaders headers = fullHttpRequest.headers();
 
 		// 从header头获取必须要传入的关键属性 uniqueId = serviceId + version
 		String uniqueId = headers.get(GatewayConst.UNIQUE_ID);
 
 		String rpcMethod = headers.get(GatewayConst.METHOD);
+
+
+		// RPC 获取参数类型和值
+		String test = headers.get(GatewayConst.PARAMETERTYPES);
+		String[] parameterTypes = null;
+		if (test != null) {
+			List<String> idList = Arrays.asList(test.split(","));
+			parameterTypes = idList.toArray(new String[0]);
+		}
+
+		test = headers.get(GatewayConst.ARGUMENTS);
+		String[] arguments = null;
+		if (test != null) {
+			List<String> idList = Arrays.asList(test.split(","));
+			arguments = idList.toArray(new String[0]);
+		}
+
 
 		//TODO 通过指定IP地址跳过负载均衡
 		String host = headers.get(HttpHeaderNames.HOST);
@@ -110,7 +122,9 @@ public class RequestHelper {
 				contentType,
 				headers,
 				fullHttpRequest,
-				rpcMethod);
+				rpcMethod,
+				parameterTypes,
+				arguments);
 
 		return gatewayRequest;
 	}
@@ -195,6 +209,7 @@ public class RequestHelper {
 
 		return true;
 	}
+
 	public static boolean isWithinTimeRange(LocalTime startTime, LocalTime endTime, LocalTime currentTime) {
 		return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
 	}

@@ -45,9 +45,6 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
     public void init(String registerAddress, String env) {
         this.registerAddress = registerAddress;
         this.env = env;
-        if(!StringUtils.isEmpty(env)){
-            PATH = PATH + PATH_SEPARATOR + env;
-        }
         try {
             zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,40000,null);
             Stat stat;
@@ -61,9 +58,19 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
                        ZooDefs.Ids.OPEN_ACL_UNSAFE,
                        CreateMode.PERSISTENT
                );
-               // 注册过的用户必须通过addAuthInfo才能操作节点，参考命令行 addauth
-                // zooKeeper.addAuthInfo("digest", "user1:123456a".getBytes());
+            }
+            if(!StringUtils.isEmpty(env)){
+                PATH = PATH + PATH_SEPARATOR + env;
+            }
+            stat = zooKeeper.exists(PATH,null);
 
+            if(stat == null){
+                String result = zooKeeper.create(
+                        PATH,
+                        new byte[0],
+                        ZooDefs.Ids.OPEN_ACL_UNSAFE,
+                        CreateMode.PERSISTENT
+                );
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -48,7 +48,7 @@
       "filterConfigs": [{
         "id": "load_balance_filter",
         "config": {
-          "load_balancer": "RoundRobin"
+          "load_balancer": "LeastActive"
         }
       },{
         "id" : "flow_ctl_filter"
