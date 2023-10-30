@@ -41,6 +41,9 @@ public class GatewayRequest implements IGatewayRequest{
     @Getter
     private final String uniqueId;
 
+    @Getter
+    private final String rpcMethod;
+
     /**
      * 进入网关开始时间
      */
@@ -169,8 +172,9 @@ public class GatewayRequest implements IGatewayRequest{
                            String uri,
                           HttpMethod method, String contentType,
                           HttpHeaders httpHeaders,
-                          FullHttpRequest fullHttpRequest) {
+                          FullHttpRequest fullHttpRequest, String rpcMethod) {
         this.uniqueId = uniqueId;
+        this.rpcMethod = rpcMethod;
         this.beginTime = currentTimeMillis();
         this.charset = charset;
         this.clientIp = clientIp;

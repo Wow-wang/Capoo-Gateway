@@ -19,7 +19,9 @@ import org.wow.core.filter.Filter;
 import org.wow.core.filter.FilterAspect;
 import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
+import org.wow.core.netty.datasourece.Connection;
 import org.wow.core.response.GatewayResponse;
+import org.wow.core.netty.datasourece.unpooled.UnpooledDataSource;
 import sun.misc.Unsafe;
 
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 import static org.wow.common.constants.FilterConst.*;
 
@@ -55,7 +58,13 @@ public class RouterFilter implements Filter {
     @Override
     public void doFilter(GatewayContext gatewayContext) throws Exception {
         log.info("route");
-
+        String protocol = gatewayContext.getRule().getProtocol();
+        if(protocol == "Dubbo"){
+            String finalUrl = gatewayContext.getRequest().getFinalUrl();
+            Connection connection = UnpooledDataSource.getInstance().getConnection(finalUrl);
+            connection.execute(gatewayContext.getRequest().get)
+            return;
+        }
         //使用java8 lambda拿到
         Optional<Rule.HystrixConfig> hystrixConfig = getHystrixConfig(gatewayContext);
         if(hystrixConfig.isPresent()){

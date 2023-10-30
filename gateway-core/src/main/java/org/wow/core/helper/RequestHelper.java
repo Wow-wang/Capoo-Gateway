@@ -78,26 +78,40 @@ public class RequestHelper {
 		
 		HttpHeaders headers = fullHttpRequest.headers();
 
-		//	从header头获取必须要传入的关键属性 uniqueId = serviceId + version
+		// 从header头获取必须要传入的关键属性 uniqueId = serviceId + version
 		String uniqueId = headers.get(GatewayConst.UNIQUE_ID);
-		
+
+		String rpcMethod = headers.get(GatewayConst.METHOD);
+
+		//TODO 通过指定IP地址跳过负载均衡
 		String host = headers.get(HttpHeaderNames.HOST);
+
 		HttpMethod method = fullHttpRequest.method();
+
+		// 获取请求的URI
 		String uri = fullHttpRequest.uri();
+
+		// 获取客户端IP地址
 		String clientIp = getClientIp(ctx, fullHttpRequest);
+
+		// 获取请求的Content-Type
 		String contentType = HttpUtil.getMimeType(fullHttpRequest) == null ? null : HttpUtil.getMimeType(fullHttpRequest).toString();
+
+		// 获取字符编码
 		Charset charset = HttpUtil.getCharset(fullHttpRequest, StandardCharsets.UTF_8);
 
+		// 创建GatewayRequest对象，用于封装网关请求的相关信息
 		GatewayRequest gatewayRequest = new GatewayRequest(uniqueId,
 				charset,
 				clientIp,
-				host, 
-				uri, 
+				host,
+				uri,
 				method,
 				contentType,
 				headers,
-				fullHttpRequest);
-		
+				fullHttpRequest,
+				rpcMethod);
+
 		return gatewayRequest;
 	}
 	
