@@ -2,6 +2,8 @@ package org.wow.common.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.wow.common.enums.ResponseCode;
+import org.wow.common.exception.ResponseException;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -38,7 +40,7 @@ public class ServiceInstance implements Serializable {
 	/**
 	 * 	权重信息
 	 */
-	protected Integer weight;
+	protected Integer weight = 10;
 	
 	/**
 	 * 	服务注册的时间戳：后面我们做负载均衡，warmup预热
@@ -54,6 +56,8 @@ public class ServiceInstance implements Serializable {
 	 * 	服务实例对应的版本号
 	 */
 	protected String version;
+
+	private int warmup = 10 * 60 * 1000;
 
 	@Getter
 	@Setter
@@ -121,6 +125,24 @@ public class ServiceInstance implements Serializable {
 	public Integer getWeight() {
 		return weight;
 	}
+	static int calculateWarmupWeight(int uptime, int warmup, int weight) {
+		int ww = (int) ( uptime / ((float) warmup / weight));
+		return ww < 1 ? 1 : (Math.min(ww, weight));
+	}
+
+	public Integer getWarmWeight(){
+		Integer warmWeight = getWeight();
+		long uptime = System.currentTimeMillis() - this.getRegisterTime();
+		if (uptime < 0) {
+			throw new ResponseException(ResponseCode.SERVICE_INVOKER_NOT_INTIME);
+		}
+
+		if (uptime > 0 && uptime < warmup) {
+			warmWeight = calculateWarmupWeight((int)uptime, warmup, getWeight());
+		}
+		return Math.max(warmWeight, 0);
+	}
+
 
 	public void setWeight(Integer weight) {
 		this.weight = weight;

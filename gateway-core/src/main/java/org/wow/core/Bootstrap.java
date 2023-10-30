@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.wow.common.config.DynamicConfigManager;
 import org.wow.common.config.ServiceDefinition;
 import org.wow.common.config.ServiceInstance;
+import org.wow.common.spi.ExtensionLoader;
 import org.wow.common.utils.NetUtils;
 import org.wow.common.utils.TimeUtil;
 import org.wow.core.filter.GatewayFilterChainFactory;
@@ -22,7 +23,7 @@ import static org.wow.common.constants.BasicConst.COLON_SEPARATOR;
 @Slf4j
 public class Bootstrap {
     public static void main(String[] args) {
-        System.out.println(Runtime.getRuntime().availableProcessors());
+//        System.out.println(Runtime.getRuntime().availableProcessors());
         // 加载网关核心静态配置
         Config config = ConfigLoader.getInstance().load(args);
         System.out.println(config.getPort());
@@ -57,16 +58,18 @@ public class Bootstrap {
          * Lambda 表达式 (rules -> DynamicConfigManager.getInstance().putAllRule(rules))
          * 作为回调函数传递给了 listener，以便在规则变更时调用它
          */
-        configCenter.subscribeRulesChange(rules ->{
+        configCenter.subscribeRulesChange(rules -> {
             // 每次更新Rule需要立即清除缓存
             GatewayFilterChainFactory.getInstance().getChainCache().invalidateAll();
             DynamicConfigManager.getInstance().putAllRule(rules);});
-        // 启动容器
-        Container container = new Container(config);
-        container.start();
+
 
         // 连接注册中心 将注册中心的实例加载到本地
         final RegisterCenter registerCenter = registerAndSubscribe(config);
+
+        // 启动容器
+        Container container = new Container(config);
+        container.start();
 
         // 服务优雅关机
         // 收到kill信号时候调用
@@ -81,14 +84,17 @@ public class Bootstrap {
     }
 
     private static RegisterCenter registerAndSubscribe(Config config) {
-        ServiceLoader<RegisterCenter> serviceLoader = ServiceLoader.load(RegisterCenter.class);
-        final RegisterCenter registerCenter = serviceLoader.findFirst().orElseThrow(() -> {
-            log.error("not found RegisterCenter impl");
-            return new RuntimeException("not found RegisterCenter impl");
-        });
+        ExtensionLoader<RegisterCenter> loader = ExtensionLoader.getExtensionLoader(RegisterCenter.class);
+//        ServiceLoader<RegisterCenter> serviceLoader = ServiceLoader.load(RegisterCenter.class);
+//        final RegisterCenter registerCenter = serviceLoader.findFirst().orElseThrow(() -> {
+//            log.error("not found RegisterCenter impl");
+//            return new RuntimeException("not found RegisterCenter impl");
+//        });
+        String registerName = config.getRegisterName();
+        RegisterCenter registerCenter = loader.getExtension(registerName);
 
         // TODO 设置Zookeeper or Nacos
-        registerCenter.init(config.getZookeeperRegistryAddress(), config.getEnv());
+        registerCenter.init(config.getRegistryAddress(), config.getEnv());
         //registerCenter.init(config.getNacosRegistryAddress(), config.getEnv());
 
 

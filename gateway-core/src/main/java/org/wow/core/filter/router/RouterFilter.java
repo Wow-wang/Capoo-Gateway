@@ -1,7 +1,9 @@
 package org.wow.core.filter.router;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.BiConsumer;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.netflix.hystrix.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.skywalking.apm.toolkit.trace.TraceCrossThread;
@@ -10,24 +12,33 @@ import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wow.common.config.Rule;
+import org.wow.common.config.ServiceInstance;
+import org.wow.common.constants.FilterConst;
 import org.wow.common.enums.ResponseCode;
 import org.wow.common.exception.ConnectException;
+import org.wow.common.exception.NotFoundException;
 import org.wow.common.exception.ResponseException;
 import org.wow.core.ConfigLoader;
 import org.wow.core.context.GatewayContext;
 import org.wow.core.filter.Filter;
 import org.wow.core.filter.FilterAspect;
+import org.wow.core.filter.GatewayFilterChainFactory;
+import org.wow.core.filter.loadbalance.LeastActiveLoadBalanceRule;
+import org.wow.core.filter.loadbalance.RoundRobinLoadBalanceRule;
 import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
+import org.wow.core.netty.datasourece.Connection;
+import org.wow.core.netty.datasourece.unpooled.UnpooledDataSource;
+import org.wow.core.request.GatewayRequest;
 import org.wow.core.response.GatewayResponse;
 import sun.misc.Unsafe;
 
 import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 import static org.wow.common.constants.FilterConst.*;
 
@@ -55,7 +66,11 @@ public class RouterFilter implements Filter {
     @Override
     public void doFilter(GatewayContext gatewayContext) throws Exception {
         log.info("route");
-
+        String protocol = gatewayContext.getRule().getProtocol();
+        if(protocol == "Dubbo"){
+            completeDubbo(gatewayContext);
+            return;
+        }
         //使用java8 lambda拿到
         Optional<Rule.HystrixConfig> hystrixConfig = getHystrixConfig(gatewayContext);
         if(hystrixConfig.isPresent()){
@@ -140,37 +155,41 @@ public class RouterFilter implements Filter {
         return future;
     }
 
+    private void routeHttpToDubbo(GatewayContext gatewayContext,Optional<Rule.HystrixConfig> hystrixConfig){
+
+    }
+
     /**
      * 可有可无
      */
 //    @TraceCrossThread
-    public class CompleteBiConsumer implements BiConsumer<Response,Throwable>{
-        private Request request;
-        private Response response;
-
-        private Throwable throwable;
-        private GatewayContext gatewayContext;
-
-        private Optional<Rule.HystrixConfig> hystrixConfig;
-
-        public CompleteBiConsumer(Request request, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
-            this.request = request;
-            this.gatewayContext = gatewayContext;
-            this.hystrixConfig = hystrixConfig;
-        }
-
-        @Override
-        public void accept(Response response, Throwable throwable) {
-            this.response = response;
-            this.throwable = throwable;
-            this.run();
-        }
-
-        public void run(){
-            //skywalking 会通过 @TraceCrossThread会增强run方法
-            complete(request,response,throwable,gatewayContext, hystrixConfig);
-        }
-    }
+//    public class CompleteBiConsumer implements BiConsumer<Response,Throwable>{
+//        private Request request;
+//        private Response response;
+//
+//        private Throwable throwable;
+//        private GatewayContext gatewayContext;
+//
+//        private Optional<Rule.HystrixConfig> hystrixConfig;
+//
+//        public CompleteBiConsumer(Request request, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
+//            this.request = request;
+//            this.gatewayContext = gatewayContext;
+//            this.hystrixConfig = hystrixConfig;
+//        }
+//
+//        @Override
+//        public void accept(Response response, Throwable throwable) {
+//            this.response = response;
+//            this.throwable = throwable;
+//            this.run();
+//        }
+//
+//        public void run(){
+//            //skywalking 会通过 @TraceCrossThread会增强run方法
+//            complete(request,response,throwable,gatewayContext, hystrixConfig);
+//        }
+//    }
 
     /**
      * 释放request 记录response
@@ -181,6 +200,7 @@ public class RouterFilter implements Filter {
      */
     private void complete(Request request, Response response, Throwable throwable, GatewayContext gatewayContext, Optional<Rule.HystrixConfig> hystrixConfig) {
         try {
+
             log.info("complete");
             // 重试
             Rule rule = gatewayContext.getRule();
@@ -193,6 +213,7 @@ public class RouterFilter implements Filter {
                 doRetry(gatewayContext,currentRetryTimes);
                 return;
             }
+
 
 
             if(Objects.nonNull(throwable)){
@@ -218,6 +239,7 @@ public class RouterFilter implements Filter {
             gatewayContext.written();
             ResponseHelper.writeResponse(gatewayContext);
 
+            updateActive(gatewayContext);
             accessLog.info("{} {} {} {} {} {} {}",
                     System.currentTimeMillis() - gatewayContext.getRequest().getBeginTime(),
                     gatewayContext.getRequest().getClientIp(),
@@ -230,13 +252,76 @@ public class RouterFilter implements Filter {
         }
     }
 
+    private void updateActive(GatewayContext gatewayContext) {
+        Rule rule = gatewayContext.getRule();
+        Set<Rule.FilterConfig> filterConfigs = gatewayContext.getRule().getFilterConfigs();
+        Iterator iterator = filterConfigs.iterator();
+        Rule.FilterConfig filterConfig;
+        while(iterator.hasNext()){
+            filterConfig = (Rule.FilterConfig)iterator.next();
+            if(filterConfig == null){
+                continue;
+            }
+            String filterId = filterConfig.getId();
+            if(filterId.equals(LOAD_BALANCE_FILTER_ID)) {
+                String config = filterConfig.getConfig();
+                if(!org.apache.commons.lang3.StringUtils.isEmpty(config)){
+                    Map<String,String> mayTypeMap = JSON.parseObject(config,Map.class);
+                    if(mayTypeMap.get(LOAD_BALANCE_KEY).equals(LOAD_BALANCE_STRATEGY_LEAST_ACTIVE)){
+                        // 并发数减少
+                        LeastActiveLoadBalanceRule.getInstance(rule.getServiceId()).getActiveCache()
+                                .get(gatewayContext.getRequest().getModifyHost(),k->{return new LongAdder();})
+                                .decrement();
+                    }
+                }
+            }
+        }
+    }
+
     private void doRetry(GatewayContext gatewayContext, int currentRetryTimes)  {
         System.out.println("当前重试次数"+currentRetryTimes);
         gatewayContext.setCurrentRetryTimes(currentRetryTimes + 1);
         try {
+            chooseNewInstance(gatewayContext);
             doFilter(gatewayContext);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void chooseNewInstance(GatewayContext gatewayContext) {
+        String serviceId = gatewayContext.getRule().getServiceId();
+        RoundRobinLoadBalanceRule loadBalance = RoundRobinLoadBalanceRule.getInstance(serviceId);
+        ServiceInstance serviceInstance = loadBalance.choose(serviceId, gatewayContext.isGray());
+        GatewayRequest request = gatewayContext.getRequest();
+        if(serviceInstance != null && request != null){
+            String host = serviceInstance.getIp() + ":" + serviceInstance.getPort();
+            request.setModifyHost(host);
+        }else{
+            log.warn("No instance available for : {}" , serviceId);
+            throw new NotFoundException(ResponseCode.SERVICE_INSTANCE_NOT_FOUND);
+        }
+    }
+
+    private void completeDubbo(GatewayContext gatewayContext) {
+        String finalUrl = gatewayContext.getRequest().getFinalUrl();
+        Connection connection = UnpooledDataSource.getInstance().getConnection(finalUrl);
+        GatewayRequest request = gatewayContext.getRequest();
+        String rpcMethod = request.getRpcMethod();
+        String[] parameterTypes = request.getParameterTypes();
+        String[] arguments = request.getArguments();
+        Object result = connection.execute(gatewayContext.getRequest().getRpcMethod(), parameterTypes, arguments);
+        gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(result));
+        gatewayContext.written();
+        ResponseHelper.writeResponse(gatewayContext);
+        updateActive(gatewayContext);
+        accessLog.info("{} {} {} {} {} {} {}",
+                System.currentTimeMillis() - gatewayContext.getRequest().getBeginTime(),
+                gatewayContext.getRequest().getClientIp(),
+                gatewayContext.getRequest().getUniqueId(),
+                gatewayContext.getRequest().getMethod(),
+                gatewayContext.getRequest().getPath(),
+                gatewayContext.getResponse().getHttpResponseStatus().code(),
+                gatewayContext.getResponse().getFutureResponse().getResponseBodyAsBytes().length);
     }
 }
