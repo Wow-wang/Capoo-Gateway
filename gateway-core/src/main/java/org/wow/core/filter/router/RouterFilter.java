@@ -27,6 +27,8 @@ import org.wow.core.filter.loadbalance.LeastActiveLoadBalanceRule;
 import org.wow.core.filter.loadbalance.RoundRobinLoadBalanceRule;
 import org.wow.core.helper.AsyncHttpHelper;
 import org.wow.core.helper.ResponseHelper;
+import org.wow.core.netty.datasourece.Connection;
+import org.wow.core.netty.datasourece.unpooled.UnpooledDataSource;
 import org.wow.core.request.GatewayRequest;
 import org.wow.core.response.GatewayResponse;
 import sun.misc.Unsafe;
@@ -64,7 +66,11 @@ public class RouterFilter implements Filter {
     @Override
     public void doFilter(GatewayContext gatewayContext) throws Exception {
         log.info("route");
-
+        String protocol = gatewayContext.getRule().getProtocol();
+        if(protocol == "Dubbo"){
+            completeDubbo(gatewayContext);
+            return;
+        }
         //使用java8 lambda拿到
         Optional<Rule.HystrixConfig> hystrixConfig = getHystrixConfig(gatewayContext);
         if(hystrixConfig.isPresent()){
@@ -295,5 +301,27 @@ public class RouterFilter implements Filter {
             log.warn("No instance available for : {}" , serviceId);
             throw new NotFoundException(ResponseCode.SERVICE_INSTANCE_NOT_FOUND);
         }
+    }
+
+    private void completeDubbo(GatewayContext gatewayContext) {
+        String finalUrl = gatewayContext.getRequest().getFinalUrl();
+        Connection connection = UnpooledDataSource.getInstance().getConnection(finalUrl);
+        GatewayRequest request = gatewayContext.getRequest();
+        String rpcMethod = request.getRpcMethod();
+        String[] parameterTypes = request.getParameterTypes();
+        String[] arguments = request.getArguments();
+        Object result = connection.execute(gatewayContext.getRequest().getRpcMethod(), parameterTypes, arguments);
+        gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(result));
+        gatewayContext.written();
+        ResponseHelper.writeResponse(gatewayContext);
+        updateActive(gatewayContext);
+        accessLog.info("{} {} {} {} {} {} {}",
+                System.currentTimeMillis() - gatewayContext.getRequest().getBeginTime(),
+                gatewayContext.getRequest().getClientIp(),
+                gatewayContext.getRequest().getUniqueId(),
+                gatewayContext.getRequest().getMethod(),
+                gatewayContext.getRequest().getPath(),
+                gatewayContext.getResponse().getHttpResponseStatus().code(),
+                gatewayContext.getResponse().getFutureResponse().getResponseBodyAsBytes().length);
     }
 }
