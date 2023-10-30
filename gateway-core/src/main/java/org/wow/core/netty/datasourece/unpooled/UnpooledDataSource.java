@@ -1,6 +1,7 @@
 package org.wow.core.netty.datasourece.unpooled;
 
 
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.apache.dubbo.config.ReferenceConfig;
@@ -32,7 +33,7 @@ public class UnpooledDataSource {
             reference.setCache("lru");
             return new DubboConnection(reference);
         });
-    }
+
 
 
 

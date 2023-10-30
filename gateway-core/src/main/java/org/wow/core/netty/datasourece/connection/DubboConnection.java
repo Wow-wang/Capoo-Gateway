@@ -1,5 +1,6 @@
 package org.wow.core.netty.datasourece.connection;
 
+
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.bootstrap.DubboBootstrap;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
@@ -11,7 +12,6 @@ import org.wow.core.netty.datasourece.SessionResult;
 public class DubboConnection implements Connection {
 
     private final GenericService genericService;
-
     public DubboConnection(ReferenceConfig<GenericService> reference) {
         // 连接远程服务
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
@@ -22,13 +22,13 @@ public class DubboConnection implements Connection {
     }
 
 
-
     /**
      * Dubbo 泛化调用：https://dubbo.apache.org/zh/docsv2.7/user/examples/generic-reference/
      */
     @Override
     public SessionResult execute(String method, String[] parameterTypes,  Object[] args) {
         return (SessionResult)genericService.$invoke(method, parameterTypes, args);
+
     }
 
 }

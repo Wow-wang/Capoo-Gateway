@@ -19,6 +19,7 @@ import org.wow.core.Config;
 import org.wow.core.LifeCycle;
 import org.wow.core.netty.processor.NettyProcessor;
 
+
 import java.net.InetSocketAddress;
 
 /**
@@ -53,6 +54,7 @@ public class NettyHttpServer implements LifeCycle {
     @Getter
     private EventLoopGroup eventLoopGroupWorker;
     private final NettyProcessor nettyProcessor;
+
 
 
     public NettyHttpServer(Config config, NettyProcessor nettyProcessor){
@@ -109,6 +111,8 @@ public class NettyHttpServer implements LifeCycle {
                                  * 处理 HTTP 请求的业务逻辑
                                  */
                                 new NettyHttpServerHandler(nettyProcessor)
+                                // 处理Rpc 请求的业务逻辑
+//                                new ProtocolDataHandler()
                         );
                     }
                 });
