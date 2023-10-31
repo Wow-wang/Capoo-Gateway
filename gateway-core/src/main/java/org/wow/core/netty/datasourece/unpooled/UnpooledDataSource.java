@@ -35,6 +35,7 @@ public class UnpooledDataSource {
             reference.setGeneric(true);  // 泛化
             reference.setApplication(application);
             reference.setAsync(true);    // 异步
+            reference.setCheck(true);
             reference.setCache("lru");
             return new DubboConnection(reference);
         });

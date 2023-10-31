@@ -20,8 +20,8 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.net.URI;
 
 
 public class RequestHelper {
@@ -73,6 +73,23 @@ public class RequestHelper {
 	private static GatewayRequest doRequest(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx) {
 
 		HttpHeaders headers = fullHttpRequest.headers();
+//		// 获取请求URI
+//		String uri = fullHttpRequest.uri();
+
+		// 使用Java的URI类来解析URI
+//		URI requestUri = new URI(uri);
+//
+//		// 获取查询参数
+//		String query = requestUri.getQuery();
+//
+//		// 如果查询参数非空，您可以进一步解析它
+//		if (query != null) {
+//			// 将查询参数解析为键值对
+//			Map<String, String> queryParams = parseQueryParameters(query);
+//
+//			// 访问特定参数的值
+//			String paramValue = queryParams.get("paramName");
+//		}
 
 		// 从header头获取必须要传入的关键属性 uniqueId = serviceId + version
 		String uniqueId = headers.get(GatewayConst.UNIQUE_ID);
@@ -230,4 +247,22 @@ public class RequestHelper {
 		}
 
 	}
+//	public static Map<String, List<String>> parseQueryParameters(String query) {
+//		Map<String, List<String>> queryParams = new HashMap<>();
+//
+//		if (query != null && !query.isEmpty()) {
+//			String[] params = query.split("&");
+//			for (String param : params) {
+//				String[] keyValue = param.split("=");
+//				if (keyValue.length == 2) {
+//					String key = keyValue[0];
+//					String value = keyValue[1];
+//					queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
+//				}
+//			}
+//		}
+//
+//		return queryParams;
+//	}
 }
+

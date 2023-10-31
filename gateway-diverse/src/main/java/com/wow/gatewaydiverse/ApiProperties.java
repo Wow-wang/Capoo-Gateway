@@ -50,4 +50,6 @@ public class ApiProperties {
     private Integer weight = 100;
 
     private Boolean gray = false;
+
+    private String rpcInterfaceName = "";
 }

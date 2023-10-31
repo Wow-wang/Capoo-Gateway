@@ -45,6 +45,7 @@ public class ApiChecker {
         String protocol = PROTOCOL_VALUE;
         Integer weight = apiProperties.getWeight();
         String env = apiProperties.getEnv();
+        String rpcInterfaceName = apiProperties.getRpcInterfaceName();
 
         serviceDefinition.setUniqueId(serviceId + ":" + version);
         serviceDefinition.setServiceId(serviceId);
@@ -52,9 +53,9 @@ public class ApiChecker {
         serviceDefinition.setEnvType(env);
         serviceDefinition.setProtocol(protocol);
         serviceDefinition.setPatternPath(patternPath);
+        serviceDefinition.setRpcInterfaceName(rpcInterfaceName);
         serviceDefinition.setEnable(true);
         serviceDefinition.setInvokerMap(null);
-
         serviceInstance.setServiceInstanceId(serviceInstanceId);
         serviceInstance.setUniqueId(serviceDefinition.getUniqueId());
         serviceInstance.setIp(ip);

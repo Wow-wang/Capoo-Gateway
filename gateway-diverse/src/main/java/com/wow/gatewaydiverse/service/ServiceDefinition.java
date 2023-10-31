@@ -1,15 +1,5 @@
 package com.wow.gatewaydiverse.service;
 
-/**
- * @program: gateway-diverse
- * @description:
- * @author: wow
- * @create: 2023-10-20 11:35
- **/
-
-
-import lombok.Builder;
-
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -17,146 +7,159 @@ import java.util.Objects;
 /**
  * 资源服务定义类：无论下游是什么样的服务都需要进行注册
  */
-@Builder
+//@Builder
 public class ServiceDefinition implements Serializable {
 
-    private static final long serialVersionUID = -8263365765897285189L;
+	private static final long serialVersionUID = -8263365765897285189L;
+	
+	/**
+	 * 	唯一的服务ID: serviceId:version
+	 */
+	private String uniqueId;
+	
+	/**
+	 * 	服务唯一id
+	 */
+	private String serviceId;
+	
+	/**
+	 * 	服务的版本号
+	 */
+	private String version;
+	
+	/**
+	 * 	服务的具体协议：http(mvc http) dubbo ..
+	 */
+	private String protocol;
+	
+	/**
+	 * 	路径匹配规则：访问真实ANT表达式：定义具体的服务路径的匹配规则
+	 */
+	private String patternPath;
+	
+	/**
+	 * 	环境名称
+	 */
+	private String envType;
 
-    /**
-     * 	唯一的服务ID: serviceId:version
-     */
-    private String uniqueId;
-
-    /**
-     * 	服务唯一id
-     */
-    private String serviceId;
-
-    /**
-     * 	服务的版本号
-     */
-    private String version;
-
-    /**
-     * 	服务的具体协议：http(mvc http) dubbo ..
-     */
-    private String protocol;
-
-    /**
-     * 	路径匹配规则：访问真实ANT表达式：定义具体的服务路径的匹配规则
-     */
-    private String patternPath;
-
-    /**
-     * 	环境名称
-     */
-    private String envType;
-
-    /**
-     * 	服务启用禁用
-     */
-    private boolean enable = true;
-
-
-    /**
-     * 	服务列表信息：
-     */
-    private Map<String /* invokerPath */, ServiceInvoker> invokerMap;
+	/**
+	 * 	服务启用禁用
+	 */
+	private boolean enable = true;
 
 
-    public ServiceDefinition() {
-        super();
-    }
 
-    public ServiceDefinition(String uniqueId, String serviceId, String version, String protocol, String patternPath,
-                             String envType, boolean enable, Map<String, ServiceInvoker> invokerMap) {
-        super();
-        this.uniqueId = uniqueId;
-        this.serviceId = serviceId;
-        this.version = version;
-        this.protocol = protocol;
-        this.patternPath = patternPath;
-        this.envType = envType;
-        this.enable = enable;
-        this.invokerMap = invokerMap;
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if(this == o) return true;
-        if(this == null || getClass() != o.getClass()) return false;
-        ServiceDefinition serviceDefinition = (ServiceDefinition)o;
-        return Objects.equals(uniqueId, serviceDefinition.uniqueId);
-    }
+	private String rpcInterfaceName;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(uniqueId);
-    }
 
-    public String getUniqueId() {
-        return uniqueId;
-    }
+	/**
+	 * 	服务列表信息：
+	 */
+	private Map<String /* invokerPath */, ServiceInvoker> invokerMap;
 
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
-    }
 
-    public String getServiceId() {
-        return serviceId;
-    }
+	public ServiceDefinition() {
+		super();
+	}
+	
+	public ServiceDefinition(String uniqueId, String serviceId, String version, String protocol, String patternPath,
+                             String envType, boolean enable, Map<String, ServiceInvoker> invokerMap, String rpcInterfaceName) {
+		super();
+		this.uniqueId = uniqueId;
+		this.serviceId = serviceId;
+		this.version = version;
+		this.protocol = protocol;
+		this.patternPath = patternPath;
+		this.envType = envType;
+		this.enable = enable;
+		this.invokerMap = invokerMap;
+		this.rpcInterfaceName = rpcInterfaceName;
+	}
 
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(this == null || getClass() != o.getClass()) return false;
+		ServiceDefinition serviceDefinition = (ServiceDefinition)o;
+		return Objects.equals(uniqueId, serviceDefinition.uniqueId);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(uniqueId);
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public String getUniqueId() {
+		return uniqueId;
+	}
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
+	}
 
-    public String getProtocol() {
-        return protocol;
-    }
+	public String getServiceId() {
+		return serviceId;
+	}
 
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
 
-    public String getPatternPath() {
-        return patternPath;
-    }
+	public String getVersion() {
+		return version;
+	}
 
-    public void setPatternPath(String patternPath) {
-        this.patternPath = patternPath;
-    }
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-    public String getEnvType() {
-        return envType;
-    }
+	public String getProtocol() {
+		return protocol;
+	}
 
-    public void setEnvType(String envType) {
-        this.envType = envType;
-    }
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
 
-    public boolean isEnable() {
-        return enable;
-    }
+	public String getPatternPath() {
+		return patternPath;
+	}
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
+	public void setPatternPath(String patternPath) {
+		this.patternPath = patternPath;
+	}
 
-    public Map<String, ServiceInvoker> getInvokerMap() {
-        return invokerMap;
-    }
+	public String getEnvType() {
+		return envType;
+	}
 
-    public void setInvokerMap(Map<String, ServiceInvoker> invokerMap) {
-        this.invokerMap = invokerMap;
-    }
+	public void setEnvType(String envType) {
+		this.envType = envType;
+	}
 
+	public boolean isEnable() {
+		return enable;
+	}
+
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
+
+	public Map<String, ServiceInvoker> getInvokerMap() {
+		return invokerMap;
+	}
+
+	public void setInvokerMap(Map<String, ServiceInvoker> invokerMap) {
+		this.invokerMap = invokerMap;
+	}
+
+	public String getRpcInterfaceName() {
+		return rpcInterfaceName;
+	}
+
+	public void setRpcInterfaceName(String rpcInterfaceName) {
+		this.rpcInterfaceName = rpcInterfaceName;
+	}
 
 }
