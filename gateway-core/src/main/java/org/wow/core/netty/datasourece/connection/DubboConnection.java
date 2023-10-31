@@ -11,6 +11,8 @@ import org.wow.core.netty.datasourece.SessionResult;
 
 import java.util.concurrent.*;
 
+import static org.wow.common.constants.BasicConst.SERVEROVERTIME;
+
 
 public class DubboConnection implements Connection {
 
@@ -38,7 +40,7 @@ public class DubboConnection implements Connection {
         try {
             result = future.get(5000, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | ExecutionException | InterruptedException e) {
-            result ="超时无响应";
+            result =SERVEROVERTIME;
         }
         return result;
     }

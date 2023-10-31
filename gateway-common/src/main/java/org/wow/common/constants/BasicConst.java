@@ -57,4 +57,6 @@ public interface BasicConst {
 
     String DISABLE = "N";
 
+    String SERVEROVERTIME = "服务超时";
+
 }

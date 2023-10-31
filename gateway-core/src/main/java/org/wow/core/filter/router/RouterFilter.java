@@ -40,6 +40,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
+import static org.wow.common.constants.BasicConst.SERVEROVERTIME;
 import static org.wow.common.constants.FilterConst.*;
 
 /**
@@ -304,6 +305,7 @@ public class RouterFilter implements Filter {
     }
 
     private void completeDubbo(GatewayContext gatewayContext) {
+        // 构造请求： url 请求方法 参数类型 参数
         GatewayRequest request = gatewayContext.getRequest();
         String url = request.getModifyHost();
         String interfaceName = request.getRpcInterfaceName();
@@ -312,10 +314,24 @@ public class RouterFilter implements Filter {
         String[] parameterTypes = request.getParameterTypes();
         String[] arguments = request.getArguments();
         Object result = connection.execute(gatewayContext.getRequest().getRpcMethod(), parameterTypes, arguments);
+
+        // 执行重试流程
+        Rule rule = gatewayContext.getRule();
+        int currentRetryTimes = gatewayContext.getCurrentRetryTimes();
+        int confRetryTimes = rule.getRetryConfig().getTimes();
+        if(result == SERVEROVERTIME && currentRetryTimes <= confRetryTimes){
+            doRetry(gatewayContext,currentRetryTimes);
+            return;
+        }
+
+        // 输出最终结果
         gatewayContext.setResponse(GatewayResponse.buildGatewayResponse(result));
         gatewayContext.written();
         ResponseHelper.writeResponse(gatewayContext);
+
+        // 更新活跃度
         updateActive(gatewayContext);
+
         accessLog.info("{} {} {} {} {} {} {}",
                 System.currentTimeMillis() - gatewayContext.getRequest().getBeginTime(),
                 gatewayContext.getRequest().getClientIp(),
