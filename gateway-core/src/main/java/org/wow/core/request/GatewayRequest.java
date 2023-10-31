@@ -321,6 +321,7 @@ public class GatewayRequest implements IGatewayRequest{
         return modifyScheme+modifyHost+modifyPath;
     }
 
+
     @Override
     public Request build() {
         requestBuilder.setUrl(getFinalUrl());
