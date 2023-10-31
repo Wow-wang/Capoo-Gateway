@@ -304,8 +304,8 @@ public class RouterFilter implements Filter {
     }
 
     private void completeDubbo(GatewayContext gatewayContext) {
-        String finalUrl = gatewayContext.getRequest().getFinalUrl();
-        Connection connection = UnpooledDataSource.getInstance().getConnection(finalUrl);
+        String url = gatewayContext.getRequest().getModifyPath();
+        Connection connection = UnpooledDataSource.getInstance().getConnection(url);
         GatewayRequest request = gatewayContext.getRequest();
         String rpcMethod = request.getRpcMethod();
         String[] parameterTypes = request.getParameterTypes();

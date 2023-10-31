@@ -95,5 +95,20 @@
       },{
         "id" : "user_auth_filter"
       }]
+    },{
+      "id" : "dubbo-test",
+      "name" : "dubbo-test",
+      "protocol" : "dubbo",
+      "serviceId" : "dubbo-test",
+      "prefix" : "/user/dubbo",
+      "paths": [
+
+      ],
+      "filterConfigs": [{
+        "id": "load_balance_filter",
+        "config": {
+          "load_balancer": "RoundRobin"
+        }
+      }]
     }]
 }

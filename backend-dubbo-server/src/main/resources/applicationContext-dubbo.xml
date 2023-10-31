@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+            http://dubbo.apache.org/schema/dubbo
+            http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系,name可以随便起名，但是不能重复 -->
+    <dubbo:application name="hello-world-producer"/>
+
+    <!-- 使用zookeeper为注册中心，客户端使用curator -->
+    <dubbo:registry address="zookeeper://192.168.220.131:2181?timeout=300000" client="curator"/>
+
+    <!--
+        qps[tps] = 100
+        tp99 = 100ms
+        threads = qps * tp99 * 10
+     -->
+    <!--  fixed 示例 -->
+        <dubbo:protocol name="dubbo" dispatcher="all" threadpool="fixed" threads="200" queues="0"/>
+
+    <!--  limited 示例 -->
+    <!--    <dubbo:protocol name="dubbo" dispatcher="all"  threadpool="limited" threadname="jiangzh" corethreads="10" threads="200" queues="0"/>-->
+
+    <!--  cached 示例 -->
+<!--    <dubbo:protocol name="dubbo" dispatcher="all"  threadpool="cached" threadname="jiangzh" corethreads="10" threads="200" queues="0" alive="60*1000"/>-->
+
+    <!--  eager 示例 -->
+<!--    <dubbo:protocol name="dubbo" dispatcher="all"  threadpool="eager" threadname="jiangzh" corethreads="10" threads="200" queues="0" alive="60*1000"/>-->
+
+    <!-- 对外提供一个providerService的服务，服务对应的实现 ref="providerService" -->
+<!--    <dubbo:service id="producerService" filter="default,myProviderFilter"-->
+<!--                   accesslog="../dubbo-log.txt"-->
+<!--                   interface="com.jiangzh.course.dubbo.service.HelloServiceAPI"-->
+<!--                   ref="iProducerService"/>-->
+
+    <!-- 两种service配置的方式 -->
+    <!--
+        filter  : 拦截器
+        executes: 执行限制
+    -->
+
+        <dubbo:service id="producerService"
+                       interface="org.producer.service.HelloServiceAPI"
+                       ref="iProducerService" />
+
+<!--    <dubbo:service id="producerService2" filter="default,myProviderFilter"-->
+<!--                   interface="com.jiangzh.course.dubbo.service.HelloServiceAPI"-->
+<!--                   ref="iProducerService">-->
+<!--        <dubbo:method name="sayHello" executes="20" />-->
+<!--    </dubbo:service>-->
+
+    <bean id="iProducerService" class="org.producer.impl.HelloServiceImpl"/>
+
+
+    <!-- 调用远程Producer的服务 -->
+<!--    <dubbo:reference id="injvmProvider"-->
+<!--                     interface="com.jiangzh.course.dubbo.service.HelloServiceAPI"  scope="local"/>-->
+</beans>
