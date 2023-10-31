@@ -154,6 +154,11 @@ public class GatewayRequest implements IGatewayRequest{
     @Getter
     private long userId;
 
+
+    @Setter
+    @Getter
+    private String rpcInterfaceName;
+
     /**
      * 构建下游请求时的http构建器
      */
@@ -272,7 +277,7 @@ public class GatewayRequest implements IGatewayRequest{
     @Override
     public String getModifyHost() {
 
-        return host;
+        return modifyHost;
     }
 
     @Override

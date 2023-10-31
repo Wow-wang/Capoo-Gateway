@@ -67,7 +67,7 @@ public class RouterFilter implements Filter {
     public void doFilter(GatewayContext gatewayContext) throws Exception {
         log.info("route");
         String protocol = gatewayContext.getRule().getProtocol();
-        if(protocol == "Dubbo"){
+        if(protocol.equals("dubbo")){
             completeDubbo(gatewayContext);
             return;
         }
@@ -304,9 +304,10 @@ public class RouterFilter implements Filter {
     }
 
     private void completeDubbo(GatewayContext gatewayContext) {
-        String url = gatewayContext.getRequest().getModifyPath();
-        Connection connection = UnpooledDataSource.getInstance().getConnection(url);
         GatewayRequest request = gatewayContext.getRequest();
+        String url = request.getModifyHost();
+        String interfaceName = request.getRpcInterfaceName();
+        Connection connection = UnpooledDataSource.getInstance().getConnection(url,interfaceName);
         String rpcMethod = request.getRpcMethod();
         String[] parameterTypes = request.getParameterTypes();
         String[] arguments = request.getArguments();

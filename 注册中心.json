@@ -50,8 +50,6 @@
         "config": {
           "load_balancer": "LeastActive"
         }
-      },{
-        "id" : "flow_ctl_filter"
       }],
       "retryConfig": {
         "times":5
@@ -100,9 +98,9 @@
       "name" : "dubbo-test",
       "protocol" : "dubbo",
       "serviceId" : "dubbo-test",
-      "prefix" : "/user/dubbo",
+      "prefix" : "/dubbo",
       "paths": [
-
+          "/dubbo"
       ],
       "filterConfigs": [{
         "id": "load_balance_filter",

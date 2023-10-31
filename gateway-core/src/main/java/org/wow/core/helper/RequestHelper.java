@@ -33,7 +33,7 @@ public class RequestHelper {
 		
 		//	根据请求对象里的uniqueId，获取资源服务信息(也就是服务定义信息)
 		ServiceDefinition serviceDefinition = DynamicConfigManager.getInstance().getServiceDefinition(gateWayRequest.getUniqueId());
-		
+
 		//	根据请求对象获取服务定义对应的方法调用，然后获取对应的规则
 		ServiceInvoker serviceInvoker = new HttpServiceInvoker();
 		serviceInvoker.setInvokerPath(gateWayRequest.getPath());
@@ -46,9 +46,10 @@ public class RequestHelper {
 					.addListener(ChannelFutureListener.CLOSE); // 释放资源后关闭
 			ReferenceCountUtil.release(request);
 		}
-
+		gateWayRequest.setRpcInterfaceName(serviceDefinition.getRpcInterfaceName());
 		// 根据请求对象获取规则
 		Rule rule = getRule(gateWayRequest,serviceDefinition.getServiceId());
+
 
 		//	构建我们而定GateWayContext对象
 		GatewayContext gatewayContext = new GatewayContext(
@@ -180,7 +181,7 @@ public class RequestHelper {
 	}
 	private static Boolean TimeJudge(Rule rule){
 		Rule.TimeConfig timeConfig = rule.getTimeConfig();
-		if(timeConfig != null) {
+		if(timeConfig.getPattern() != null) {
 			String pattern = timeConfig.getPattern();
 			if (pattern.equals("After")) {
 				LocalDateTime afterTime = LocalDateTime.parse(timeConfig.getAfter(), DateTimeFormatter.ISO_DATE_TIME);

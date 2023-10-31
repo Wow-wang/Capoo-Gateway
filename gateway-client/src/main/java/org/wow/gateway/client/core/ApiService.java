@@ -21,4 +21,6 @@ public @interface ApiService {
 
     String patternPath();
 
+    String interfaceName() default "";
+
 }

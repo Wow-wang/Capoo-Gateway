@@ -16,7 +16,6 @@ public interface GatewayConst {
 
 	String BUFFER_TYPE_PARALLEL = "parallel";
 
-	String METHOD = "method";
 	String PARAMETERTYPES = "parameterTypes";
 	String ARGUMENTS = "arguments";
 }

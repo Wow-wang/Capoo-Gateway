@@ -1,6 +1,8 @@
 package org.wow.common.config;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -9,7 +11,7 @@ import java.util.Objects;
 /**
  * 资源服务定义类：无论下游是什么样的服务都需要进行注册
  */
-@Builder
+//@Builder
 public class ServiceDefinition implements Serializable {
 
 	private static final long serialVersionUID = -8263365765897285189L;
@@ -50,6 +52,11 @@ public class ServiceDefinition implements Serializable {
 	private boolean enable = true;
 
 
+
+
+	private String rpcInterfaceName;
+
+
 	/**
 	 * 	服务列表信息：
 	 */
@@ -61,7 +68,7 @@ public class ServiceDefinition implements Serializable {
 	}
 	
 	public ServiceDefinition(String uniqueId, String serviceId, String version, String protocol, String patternPath,
-                             String envType, boolean enable, Map<String, ServiceInvoker> invokerMap) {
+                             String envType, boolean enable, Map<String, ServiceInvoker> invokerMap, String rpcInterfaceName) {
 		super();
 		this.uniqueId = uniqueId;
 		this.serviceId = serviceId;
@@ -71,6 +78,7 @@ public class ServiceDefinition implements Serializable {
 		this.envType = envType;
 		this.enable = enable;
 		this.invokerMap = invokerMap;
+		this.rpcInterfaceName = rpcInterfaceName;
 	}
 
 	@Override
@@ -149,6 +157,13 @@ public class ServiceDefinition implements Serializable {
 	public void setInvokerMap(Map<String, ServiceInvoker> invokerMap) {
 		this.invokerMap = invokerMap;
 	}
-	
+
+	public String getRpcInterfaceName() {
+		return rpcInterfaceName;
+	}
+
+	public void setRpcInterfaceName(String rpcInterfaceName) {
+		this.rpcInterfaceName = rpcInterfaceName;
+	}
 
 }

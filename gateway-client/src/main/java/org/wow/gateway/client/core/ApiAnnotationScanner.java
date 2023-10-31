@@ -54,6 +54,7 @@ public class ApiAnnotationScanner {
         ApiProtocol protocol = apiService.protocol();
         String patternPath = apiService.patternPath();
         String version = apiService.version();
+        String interfaceName = apiService.interfaceName();
 
         ServiceDefinition serviceDefinition = new ServiceDefinition();
 
@@ -95,6 +96,7 @@ public class ApiAnnotationScanner {
             serviceDefinition.setUniqueId(serviceId + BasicConst.COLON_SEPARATOR + version);
             serviceDefinition.setServiceId(serviceId);
             serviceDefinition.setVersion(version);
+            serviceDefinition.setRpcInterfaceName(interfaceName);
             serviceDefinition.setProtocol(protocol.getCode());
             serviceDefinition.setPatternPath(patternPath);
             serviceDefinition.setEnable(true);

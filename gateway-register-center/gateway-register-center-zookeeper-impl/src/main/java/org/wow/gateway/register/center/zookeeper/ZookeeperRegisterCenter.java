@@ -33,8 +33,11 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
 
     private static  String PATH = "/api-gateway-service";
 
+
+
     private String registerAddress;
     private String env;
+    private  String DEVPATH = "/api-gateway-service";
 
     //监听器列表
     /**
@@ -45,6 +48,7 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
     public void init(String registerAddress, String env) {
         this.registerAddress = registerAddress;
         this.env = env;
+        DEVPATH = DEVPATH + "/" + env;
         try {
             zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,40000,null);
             Stat stat;
@@ -59,14 +63,11 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
                        CreateMode.PERSISTENT
                );
             }
-            if(!StringUtils.isEmpty(env)){
-                PATH = PATH + PATH_SEPARATOR + env;
-            }
-            stat = zooKeeper.exists(PATH,null);
+            stat = zooKeeper.exists(DEVPATH,null);
 
             if(stat == null){
                 String result = zooKeeper.create(
-                        PATH,
+                        DEVPATH,
                         new byte[0],
                         ZooDefs.Ids.OPEN_ACL_UNSAFE,
                         CreateMode.PERSISTENT
@@ -88,9 +89,9 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
         // 查看当前目录下面是否有 serviceDefinition
         try {
             Stat stat;
-            stat = zooKeeper.exists(PATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION,null);
+            stat = zooKeeper.exists(DEVPATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION,null);
             // 更新服务定义
-            String definitionPath = PATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION;
+            String definitionPath = DEVPATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION;
             log.info("definitionPath:{}",definitionPath);
             if(stat == null) {
                 zooKeeper.create(
@@ -107,7 +108,7 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
                 );
             }
             // 在服务定义下面列表中创建服务实例
-            String instancePath = PATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION + PATH_SEPARATOR + serviceInstance.getServiceInstanceId() + INSTANCE;
+            String instancePath = DEVPATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION + PATH_SEPARATOR + serviceInstance.getServiceInstanceId() + INSTANCE;
             log.info("instancePath:{}",instancePath);
             stat = zooKeeper.exists(instancePath,null);
             if(stat == null){
@@ -131,7 +132,7 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
     public void deregister(ServiceDefinition serviceDefinition, ServiceInstance serviceInstance) {
         try {
             Stat stat;
-            String servicePath = PATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION;
+            String servicePath = DEVPATH + PATH_SEPARATOR + serviceDefinition.getServiceId() + DEFINITION;
             stat = zooKeeper.exists(servicePath,null);
             if(stat != null){
                 String instancePath = servicePath + PATH_SEPARATOR + serviceInstance.getServiceInstanceId() + INSTANCE;
@@ -170,10 +171,10 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
         // 获取主node 下面有多少个node 每个node是一个服务定义
         try {
             // 子节点只能感知子节点 不能感知子节点的子节点变化
-            List<String> childrenDefinition = zooKeeper.getChildren(PATH, null);
+            List<String> childrenDefinition = zooKeeper.getChildren(DEVPATH, null);
             // child是serviceId
             for(String definition : childrenDefinition){
-                byte[] data = zooKeeper.getData(PATH + PATH_SEPARATOR + definition, false, new Stat());
+                byte[] data = zooKeeper.getData(DEVPATH + PATH_SEPARATOR + definition, false, new Stat());
                 // 定位不到serviceDefinition直接跳过
                 if(data == null){
                     continue;
@@ -184,13 +185,13 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
                 ServiceDefinition serviceDefinition = JSON.parseObject(definitionString).toJavaObject(ServiceDefinition.class);
 //                log.info("读取到的serviceDefinition : {}",serviceDefinition);
                 Set<ServiceInstance> set = new HashSet<>();
-                List<String> childrenInstance = zooKeeper.getChildren(PATH + PATH_SEPARATOR + definition, false);
+                List<String> childrenInstance = zooKeeper.getChildren(DEVPATH + PATH_SEPARATOR + definition, false);
                 // 如果服务实例为空 删除当前服务定义
                 // 不行 也需要上传空set覆盖原来的
 
                 if(childrenInstance.isEmpty()){
                     // 相比于走下面for循环 增加delete操作
-                    zooKeeper.delete(PATH + PATH_SEPARATOR + definition,-1);
+                    zooKeeper.delete(DEVPATH + PATH_SEPARATOR + definition,-1);
                     registerCenterListenerList.stream()
                             .forEach(l->l.onChange(serviceDefinition,null));
                     continue;
@@ -198,7 +199,7 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
 
 
                 for(String instance : childrenInstance){
-                    byte[] dataInstance = zooKeeper.getData(PATH + PATH_SEPARATOR + definition + PATH_SEPARATOR + instance, false, new Stat());
+                    byte[] dataInstance = zooKeeper.getData(DEVPATH + PATH_SEPARATOR + definition + PATH_SEPARATOR + instance, false, new Stat());
                     if(dataInstance == null){
                         continue;
                     }

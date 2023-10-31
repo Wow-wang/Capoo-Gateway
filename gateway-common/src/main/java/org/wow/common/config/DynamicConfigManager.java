@@ -75,6 +75,7 @@ public class DynamicConfigManager {
 		set.add(serviceInstance);
 	}
 
+
 	// 会覆盖原来的set集合 旧实例不可用直接覆盖
 	public void addServiceInstance(String uniqueId, Set<ServiceInstance> serviceInstanceSet) {
 		if(uniqueId == null || serviceInstanceSet.isEmpty()) return;
