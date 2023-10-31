@@ -37,14 +37,6 @@
             </exclusions>
             <version>2.7.15</version>
         </dependency>
-
-            <!--graphql end-->
-
-
-
-
-
-
         <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
 <!--            <artifactId>spring-boot-starter-webflux</artifactId>-->
@@ -98,7 +90,6 @@
 <!--            <artifactId>spring-boot-starter-actuator</artifactId>-->
 <!--            <version>2.1.7.RELEASE</version>-->
 <!--        </dependency>-->
-
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>

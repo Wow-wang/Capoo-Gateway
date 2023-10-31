@@ -24,15 +24,16 @@ public class UnpooledDataSource {
         return INSTANCE;
     }
     public Connection getConnection(String address) {
-        return serviceCache.get(address,k->{
+        return serviceCache.get(address, k -> {
             // 服务引用
             ReferenceConfig<GenericService> reference = new ReferenceConfig<GenericService>();
-            reference.setUrl("dubbo://"+ address);
+            reference.setUrl("dubbo://" + address);
             reference.setGeneric(true);  // 泛化
             reference.setAsync(true);    // 异步
             reference.setCache("lru");
             return new DubboConnection(reference);
         });
+    }
 
 
 
