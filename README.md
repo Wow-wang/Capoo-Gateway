@@ -40,9 +40,10 @@
 
 
 ## 使用
-更改Nacos Zookeeper Redis的注册地址
-启动demo后端服务器backend-dubbo-server（Dubbo下游服务）, backend-http-server（SpringMVC下游服务）, gateway-diverse与test.js文件（异构微服务）
-启动gateway-core#Bootstrap
+- 更改Nacos Zookeeper Redis的注册地址（下游服务和Bootstrap里）
+- 启动demo后端服务器backend-dubbo-server（Dubbo下游服务）, backend-http-server（SpringMVC下游服务）
+- 启动Tutu中间件：gateway-diverse 与 test.js文件（异构微服务）
+- 启动gateway-core#Bootstrap
 
 执行参数：
 uniqueId 选择的service以及对应的版本 
