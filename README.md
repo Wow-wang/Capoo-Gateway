@@ -35,8 +35,29 @@
 ## 项目计划（亿点难...）
 
 - 安全防护： WAF防护、机器人拦截 IP黑白名单的请求屏蔽插件，支持多种认证鉴权策略，如：HMAC、JWT、Basic-AUTH、OIDC
-- 云原生 流量网关 ...
+- 流量网关 ...
 - ...
+
+
+## 使用
+- 更改Nacos Zookeeper Redis的注册地址（下游服务和Bootstrap里）
+- 启动demo后端服务器backend-dubbo-server（Dubbo下游服务）, backend-http-server（SpringMVC下游服务）
+- 启动Tutu中间件：gateway-diverse 与 test.js文件（异构微服务）
+- 启动gateway-core#Bootstrap
+
+执行参数：
+uniqueId 选择的service以及对应的版本 
+gray 是否调用灰度服务
+method：rpc接口名
+parameterTypes：参数类型
+arguments：参数值
+更多参数请看Config文件
+
+例子：
+![image](https://github.com/Wow-wang/Capoo-Api-gateway/assets/59164226/23eb14b0-e1d4-48bd-90b0-4d7e4852417b)
+![image](https://github.com/Wow-wang/Capoo-Api-gateway/assets/59164226/caaafd14-4fb6-4a73-b08a-4791d125753f)
+
+
 
 
 
