@@ -58,10 +58,10 @@ public class Bootstrap {
          * Lambda 表达式 (rules -> DynamicConfigManager.getInstance().putAllRule(rules))
          * 作为回调函数传递给了 listener，以便在规则变更时调用它
          */
-        configCenter.subscribeRulesChange(rules -> {
-            // 每次更新Rule需要立即清除缓存
+        configCenter.subscribeRulesChange(ruleMap -> {
             GatewayFilterChainFactory.getInstance().getChainCache().invalidateAll();
-            DynamicConfigManager.getInstance().putAllRule(rules);});
+            // 每次更新Rule需要立即清除缓存
+            DynamicConfigManager.getInstance().putAllRule(ruleMap);});
 
 
         // 连接注册中心 将注册中心的实例加载到本地

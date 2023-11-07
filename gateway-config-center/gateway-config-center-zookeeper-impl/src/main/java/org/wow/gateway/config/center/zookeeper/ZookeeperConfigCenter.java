@@ -14,9 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 
 import static org.wow.common.constants.BasicConst.PATH_SEPARATOR;
 import static org.wow.common.constants.CenterConst.*;
@@ -125,7 +128,9 @@ public class ZookeeperConfigCenter implements ConfigCenter {
                     String config = new String(data, StandardCharsets.UTF_8);
 //                System.out.println("Node data: " + new String(data));
                     List<Rule> rules = JSON.parseObject(config).getJSONArray("rules").toJavaList(Rule.class);
-                    listener.onRulesChange(rules);
+                    Map<String,List<Rule>> ruleMap = new ConcurrentHashMap<>();
+                    ruleMap.put("已经废弃",rules);
+                    listener.onRulesChange(ruleMap);
                 }
             } else {
                 System.out.println("Node does not exist.");
@@ -140,8 +145,8 @@ public class ZookeeperConfigCenter implements ConfigCenter {
     public static void main(String[] args) throws InterruptedException, KeeperException {
         ZookeeperConfigCenter zookeeperConfigCenter = new ZookeeperConfigCenter();
         zookeeperConfigCenter.init("dev");
-        zookeeperConfigCenter.subscribeRulesChange(rules -> DynamicConfigManager.getInstance()
-                .putAllRule(rules));
+//        zookeeperConfigCenter.subscribeRulesChange(rules -> DynamicConfigManager.getInstance()
+//                .putAllRule(rules));
         List<String> list = zookeeperConfigCenter.zooKeeper.getChildren("/", false);
         for (String string : list) {
             System.out.println(string);

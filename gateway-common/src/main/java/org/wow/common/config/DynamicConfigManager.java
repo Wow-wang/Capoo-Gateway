@@ -18,8 +18,8 @@ public class DynamicConfigManager {
 	//	服务的实例集合：uniqueId与一对服务实例对应
 	private ConcurrentHashMap<String /* uniqueId */ , Set<ServiceInstance>>  serviceInstanceMap = new ConcurrentHashMap<>();
 
-	//	规则集合
-	private ConcurrentHashMap<String /* ruleId */ , Rule>  ruleMap = new ConcurrentHashMap<>();
+	//	规则集合 Node配置 -> 下面的所有Rule
+	private ConcurrentHashMap<String /* ruleId */ , List<Rule>>  ruleMap = new ConcurrentHashMap<>();
 
 	// 路径以及规则集合
 	private ConcurrentHashMap<String /* 路径 */ , Rule> pathRuleMap = new ConcurrentHashMap<>();
@@ -27,7 +27,9 @@ public class DynamicConfigManager {
 
 	private DynamicConfigManager() {
 	}
-	
+
+
+
 	private static class SingletonHolder {
 		private static final DynamicConfigManager INSTANCE = new DynamicConfigManager();
 	}
@@ -117,10 +119,7 @@ public class DynamicConfigManager {
 	
 		
 	/***************** 	对规则缓存进行操作的系列方法 	***************/
-	
-	public void putRule(String ruleId, Rule rule) {
-		ruleMap.put(ruleId, rule);
-	}
+
 
 	/**
 	 * 最开始BootStrap加载的时候 把规则刷新到管理器内部
@@ -167,16 +166,104 @@ public class DynamicConfigManager {
 	 *       }]
 	 *     }
 	 */
-	public void putAllRule(List<Rule> ruleList) {
-		ConcurrentHashMap<String,Rule> newRuleMap = new ConcurrentHashMap<>();
+	public void putAllRule(Map<String,List<Rule>> rules) {
+		ConcurrentHashMap<String,Rule> newPathMap = new ConcurrentHashMap<>();
+		ConcurrentHashMap<String,List<Rule>> newServiceMap = new ConcurrentHashMap<>();
+		for(List<Rule> ruleList : rules.values()) {
+			for (Rule rule : ruleList) {
+				List<Rule> rulesTemp = newServiceMap.get(rule.getServiceId());
+				if (rulesTemp == null) {
+					rulesTemp = new ArrayList<>();
+				}
+				rulesTemp.add(rule);
+				newServiceMap.put(rule.getServiceId(), rulesTemp);
+				List<String> paths = rule.getPaths();
+				for (String path : paths) {
+					String key = rule.getServiceId() + "." + path;
+					newPathMap.put(key, rule);
+				}
+			}
+		}
+
+		ruleMap = (ConcurrentHashMap<String, List<Rule>>) rules;
+		// 1 对 1
+		pathRuleMap = newPathMap;
+		// 1 对 多
+		serviceRuleMap = newServiceMap;
+
+	}
+
+
+	/** -------------------------------RuleMap--------------------------------------------- **/
+	// 删除这个节点下所有的rule
+	public void removeRuleNode(String node) {
+		ruleMap.remove(node);
+	}
+
+	public List<Rule> getRuleNode(String node){
+		return ruleMap.get(node);
+	}
+
+	public void updateRuleNode(String node,List<Rule> rules){
+		ruleMap.get(node).addAll(rules);
+	}
+
+
+	public void putRuleNode(String node, List<Rule> rules){
+		ruleMap.put(node,rules);
+	}
+	public void deleteRuleNode(String node){
+		ruleMap.remove(node);
+	}
+
+	/** ---------------------------------pathRuleMap------------------------------------------- **/
+	public Rule getRuleByPath(String path){
+		return pathRuleMap.get(path);
+	}
+
+	public void putRuleByPath(String path,Rule rule){
+		pathRuleMap.put(path,rule);
+	}
+	public void putAllRulesByPath(Map<String,Rule> rules){
+		pathRuleMap.putAll(rules);
+	}
+
+	public void removeRuleByPath(String path){
+		pathRuleMap.remove(path);
+	}
+
+	public void removeOneRuleByPath(String path){
+		pathRuleMap.remove(path);
+	}
+
+	/** --------------------------------serviceRuleMap-------------------------------------------- **/
+	public List<Rule> getRuleByServiceId(String serviceId){
+		return serviceRuleMap.get(serviceId);
+	}
+
+	public void putRuleByServiceId(String serviceId, List<Rule> list){
+		serviceRuleMap.put(serviceId,list);
+	}
+	
+	public void putAllRulesByServiceId(Map<String,List<Rule>> rules){
+		serviceRuleMap.putAll(rules);
+	}
+
+	public void removeOneRuleByServiceId(String serviceId,Rule rule){
+		serviceRuleMap.get(serviceId).remove(rule);
+	}
+	public void removeAllRuleByServiceId(String serviceId){
+		serviceRuleMap.remove(serviceId);
+	}
+
+	public void putNewRules(String node, List<Rule> ruleList){
+
 		ConcurrentHashMap<String,Rule> newPathMap = new ConcurrentHashMap<>();
 		ConcurrentHashMap<String,List<Rule>> newServiceMap = new ConcurrentHashMap<>();
 		for(Rule rule : ruleList){
 			// Rule id
-			newRuleMap.put(rule.getId(),rule);
 			// Rule serviceId
 //			System.out.println(rule.getServiceId());
-
 			List<Rule> rules = newServiceMap.get(rule.getServiceId());
 			if(rules == null){
 				rules = new ArrayList<>();
@@ -191,37 +278,25 @@ public class DynamicConfigManager {
 				newPathMap.put(key,rule);
 			}
 		}
-		ruleMap = newRuleMap;
-
-		// 1 对 1
-		pathRuleMap = newPathMap;
-
-		// 1 对 多
-		serviceRuleMap = newServiceMap;
-
-//		Map<String, Rule> map = ruleList.stream()
-//				.collect(Collectors.toMap(Rule::getId, r -> r));
-//		ruleMap = new ConcurrentHashMap<>(map);
-	}
-	
-	public Rule getRule(String ruleId) {
-		return ruleMap.get(ruleId);
-	}
-	
-	public void removeRule(String ruleId) {
-		ruleMap.remove(ruleId);
-	}
-	
-	public ConcurrentHashMap<String, Rule> getRuleMap() {
-		return ruleMap;
+		putRuleNode(node,ruleList);
+		putAllRulesByServiceId(newServiceMap);
+		putAllRulesByPath(newPathMap);
 	}
 
-	public Rule getRuleByPath(String path){
-		return pathRuleMap.get(path);
+	public void deleteRules(String node){
+		List<Rule> ruleList = getRuleNode(node);
+		for(Rule rule : ruleList){
+			String serviceId = rule.getServiceId();
+			removeOneRuleByServiceId(serviceId,rule);
+			List<String> paths = rule.getPaths();
+			for (String path : paths) {
+				String key = rule.getServiceId()+"."+path;
+				removeOneRuleByPath(key);
+			}
+		}
+		deleteRuleNode(node);
 	}
 
-	public List<Rule> getRuleByServiceId(String serviceId){
-		return serviceRuleMap.get(serviceId);
-	}
+
 
 }

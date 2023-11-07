@@ -12,7 +12,9 @@ import org.wow.gateway.config.center.api.ConfigCenter;
 import org.wow.gateway.config.center.api.RulesChangeListener;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 import static org.wow.common.constants.CenterConst.NACOS_REGISTER_ADDRESS;
@@ -71,8 +73,10 @@ public class NacosConfigCenter implements ConfigCenter {
                 log.info("{}",rule);
 //                System.out.println(rule.getId());
             }
+            Map<String,List<Rule>> ruleMap = new ConcurrentHashMap<>();
+            ruleMap.put(DATA_ID,rules);
             // 这表示在订阅规则变化后，首先会通知监听器进行初始配置的处理 比如更新DynamicConfigManager的Rules集合
-            listener.onRulesChange(rules);
+            listener.onRulesChange(ruleMap);
 
             // 监听变化
             configService.addListener(DATA_ID, env, new Listener() {
@@ -93,7 +97,9 @@ public class NacosConfigCenter implements ConfigCenter {
                 public void receiveConfigInfo(String configInfo) {
                     log.info("config from nacos: {}",configInfo);
                     List<Rule> rules = JSON.parseObject(configInfo).getJSONArray("rules").toJavaList(Rule.class);
-                    listener.onRulesChange(rules);
+                    Map<String,List<Rule>> ruleMap = new ConcurrentHashMap<>();
+                    ruleMap.put(DATA_ID,rules);
+                    listener.onRulesChange(ruleMap);
                 }
             });
 
