@@ -44,6 +44,8 @@ public class ZookeeperRegisterCenter implements RegisterCenter {
      * CopyOnWriteArrayList 是线程安全的，可以在多线程环境下安全地进行读取操作，而不需要额外的同步措施。这使得它适用于读多写少的场景
      */
     private List<RegisterCenterListener> registerCenterListenerList  = new CopyOnWriteArrayList<>();
+
+
     @Override
     public void init(String registerAddress, String env) {
         this.registerAddress = registerAddress;

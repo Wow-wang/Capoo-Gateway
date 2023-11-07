@@ -15,4 +15,6 @@ import java.util.Set;
 public interface RegisterCenterListener {
 
     void onChange(ServiceDefinition serviceDefinition, Set<ServiceInstance> serviceInstanceSet);
+
+
 }

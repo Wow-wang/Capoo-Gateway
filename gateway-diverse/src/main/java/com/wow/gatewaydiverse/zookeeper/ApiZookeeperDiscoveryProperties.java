@@ -31,7 +31,7 @@ public class ApiZookeeperDiscoveryProperties {
 
     @PostConstruct
     public void init(){
-        String registerAddress = "192.168.88.128" + ":2181";
+        String registerAddress = "192.168.220.131" + ":2181";
 
         try {
             zooKeeper = new ZooKeeper(registerAddress,40000,null); Stat stat;

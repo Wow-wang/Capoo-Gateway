@@ -43,7 +43,7 @@ public class ZookeeperConfigCenter implements ConfigCenter {
     public void init(String env) {
         Stat stat;
         try {
-            zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,40000,null);
+            zooKeeper = new ZooKeeper(ZOOKEEPER_REGISTER_ADDRESS,80000,null);
             this.env = env;
             stat = zooKeeper.exists(PATH,null);
             if(stat == null) {

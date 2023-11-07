@@ -1,4 +1,4 @@
-zookeeper=org.wow.gateway.register.center.zookeeper.ZookeeperRegisterCenter
+zookeeper=org.wow.gateway.register.center.zookeeper.CuratorRegisterCenter
 nacos=org.wow.gateway.register.center.nacos.NacosRegisterCenter
 
 

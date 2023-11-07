@@ -22,7 +22,7 @@ public class Config {
 
 
     // 自己调整
-    private String zookeeperRegistryAddress = "192.168.88.128:2181";
+    private String zookeeperRegistryAddress = "192.168.220.131:2181";
 
     private String nacosRegistryAddress = "127.0.0.1:8848";
 

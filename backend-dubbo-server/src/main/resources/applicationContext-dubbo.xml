@@ -12,7 +12,7 @@
     <dubbo:application name="hello-world-producer"/>
 
     <!-- 使用zookeeper为注册中心，客户端使用curator -->
-    <dubbo:registry address="zookeeper://192.168.88.128:2181?timeout=600000" client="curator"/>
+    <dubbo:registry address="zookeeper://192.168.220.131:2181?timeout=600000" client="curator"/>
 
     <!--
         qps[tps] = 100

@@ -78,7 +78,11 @@ public class DynamicConfigManager {
 
 	// 会覆盖原来的set集合 旧实例不可用直接覆盖
 	public void addServiceInstance(String uniqueId, Set<ServiceInstance> serviceInstanceSet) {
-		if(uniqueId == null || serviceInstanceSet.isEmpty()) return;
+		if(uniqueId == null) return;
+		if(serviceInstanceSet.isEmpty()){
+			serviceInstanceMap.remove(uniqueId);
+			return;
+		}
 		serviceInstanceMap.put(uniqueId, serviceInstanceSet);
 	}
 	
@@ -188,7 +192,11 @@ public class DynamicConfigManager {
 			}
 		}
 		ruleMap = newRuleMap;
+
+		// 1 对 1
 		pathRuleMap = newPathMap;
+
+		// 1 对 多
 		serviceRuleMap = newServiceMap;
 
 //		Map<String, Rule> map = ruleList.stream()
