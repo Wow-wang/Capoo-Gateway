@@ -76,6 +76,9 @@ public class Config {
     private String waitStrategy = "busySpin";
 
 
+    private boolean startSSL = false;
+
+
 
     public WaitStrategy getWaitStrategy(){
         switch(waitStrategy){

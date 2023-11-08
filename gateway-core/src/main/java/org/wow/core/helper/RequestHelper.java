@@ -113,10 +113,14 @@ public class RequestHelper {
 		}
 
 
-		//TODO 通过指定IP地址跳过负载均衡
 		String host = headers.get(HttpHeaderNames.HOST);
 
+
+
+
 		HttpMethod method = fullHttpRequest.method();
+
+
 
 		// 获取请求的URI
 		String uri = fullHttpRequest.uri();
@@ -124,11 +128,20 @@ public class RequestHelper {
 		// 获取客户端IP地址
 		String clientIp = getClientIp(ctx, fullHttpRequest);
 
+
+
+
+
 		// 获取请求的Content-Type
 		String contentType = HttpUtil.getMimeType(fullHttpRequest) == null ? null : HttpUtil.getMimeType(fullHttpRequest).toString();
 
 		// 获取字符编码
 		Charset charset = HttpUtil.getCharset(fullHttpRequest, StandardCharsets.UTF_8);
+
+
+
+
+
 
 		// 创建GatewayRequest对象，用于封装网关请求的相关信息
 		GatewayRequest gatewayRequest = new GatewayRequest(uniqueId,
@@ -146,7 +159,8 @@ public class RequestHelper {
 
 		return gatewayRequest;
 	}
-	
+
+
 	/**
 	 * 获取客户端ip
 	 */
@@ -189,11 +203,14 @@ public class RequestHelper {
 				.stream().filter(r->gateWayRequest.getPath().startsWith(r.getPrefix()))
 				.findAny().orElseThrow(()->new ResponseException(ResponseCode.PATH_NO_MATCHED));
 
+
+		// 时间判断
 		if(TimeJudge(rule)){
 			return rule;
 		}else{
 			throw new ResponseException(ResponseCode.PATH_NO_MATCHED);
 		}
+
 
 	}
 	private static Boolean TimeJudge(Rule rule){

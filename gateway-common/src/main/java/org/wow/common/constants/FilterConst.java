@@ -57,4 +57,9 @@ public interface FilterConst {
     String USER_AUTH_FILTER_NAME = "user_auth_filter";
     int USER_AUTH_FILTER_ORDER = 1;
 
+
+    String BASIC_AUTH_FILTER_ID = "basic_auth_filter";
+    String BASIC_AUTH_FILTER_NAME = "basic_auth_filter";
+    int BASIC_AUTH_FILTER_ORDER = 1;
+
 }

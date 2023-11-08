@@ -3,6 +3,7 @@ package org.wow.core.netty;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -11,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,12 @@ import org.wow.core.LifeCycle;
 import org.wow.core.netty.processor.NettyProcessor;
 
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import java.io.FileInputStream;
 import java.net.InetSocketAddress;
+import java.security.KeyStore;
 
 /**
  * @program: api-gateway
@@ -91,6 +98,33 @@ public class NettyHttpServer implements LifeCycle {
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
+
+                        if(config.isStartSSL()) {
+                            // 添加sslhandler
+                            // 创建 SSL 上下文
+                            char[] passArray = "hsc123".toCharArray(); //jks密码
+                            SSLContext sslContext = SSLContext.getInstance("TLSv1");
+                            KeyStore ks = KeyStore.getInstance("JKS");
+
+                            //加载keytool 生成的文件
+                            FileInputStream inputStream = new FileInputStream("f:/local.jks");
+                            ks.load(inputStream, passArray);
+
+                            // 初始化 KeyManagerFactory
+                            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                            kmf.init(ks, passArray);
+
+                            // 使用 KeyManagers 初始化 SSL 上下文
+                            sslContext.init(kmf.getKeyManagers(), null, null);
+                            inputStream.close();
+
+                            // 创建 SSL 引擎并设置为服务器模式
+                            SSLEngine sslEngine = sslContext.createSSLEngine();
+                            sslEngine.setUseClientMode(false);
+
+                            ch.pipeline().addLast(new SslHandler(sslEngine));
+                        }
+
                         ch.pipeline().addLast(
                                 /**
                                  * 用于处理HTTP请求和响应的编码和解码
