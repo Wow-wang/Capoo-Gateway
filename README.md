@@ -30,6 +30,7 @@
 - 服务异常处理机制：支持Failover、Failfast、Failsafe
 - Mock接口：方便前端联调
 - 流量安全：配置RBAC权限管控；Basic Auth，JWT，OAUTH2网关统一鉴权；服务隔离，支持内部服务外网隔离；SSL/TLS安全传输；网络攻击防护
+- 对于特殊请求可以设置token实现粘性会话
 - ...
 
 
